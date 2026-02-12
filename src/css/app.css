@@ -1,0 +1,15 @@
+/* Global styles */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.calculation-result {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+}
+
+.blade-tilt-value {
+  color: #027BE3;
+  font-weight: 600;
+}
