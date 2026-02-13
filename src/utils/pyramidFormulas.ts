@@ -97,32 +97,6 @@ export function calculatePyramid(inputs: PyramidInputs): PyramidOutputs {
     maxHeightFor45Deg = apothem * Math.tan(sideSlopeMaxRad);
   }
 
-  // 10. Generate warnings
-  const warnings: string[] = [];
-
-  if (!isMiteredFeasible) {
-    if (bladeTiltMitered > MAX_BLADE_TILT) {
-      warnings.push(
-        `Mitered blade tilt (${formatResult(bladeTiltMitered)}°) exceeds 45° table saw limit. ` +
-        `Reduce height to ${formatResult(maxHeightFor45Deg)}" or less.`
-      );
-    } else {
-      warnings.push(
-        `Mitered blade tilt (${formatResult(bladeTiltMitered)}°) is negative. ` +
-        `Check pyramid dimensions.`
-      );
-    }
-  }
-
-  if (!isButtedFeasible) {
-    if (Math.abs(bladeTiltButted) > MAX_BLADE_TILT) {
-      warnings.push(
-        `Butted blade tilt (${formatResult(bladeTiltButted)}°) exceeds ±45° table saw limit. ` +
-        `Adjust pyramid dimensions or use mitered joints.`
-      );
-    }
-  }
-
   return {
     baseSideLength: formatResult(baseSideLength),
     miterAngle: formatResult(miterAngle),
@@ -130,10 +104,6 @@ export function calculatePyramid(inputs: PyramidInputs): PyramidOutputs {
     sideSlope: formatResult(sideSlope),
     bladeTiltMitered: formatResult(bladeTiltMitered),
     bladeTiltButted: formatResult(bladeTiltButted),
-    dihedralAngle: formatResult(dihedralAngle),
-    isMiteredFeasible,
-    isButtedFeasible,
-    maxHeightFor45Deg: formatResult(maxHeightFor45Deg),
-    warnings
+    dihedralAngle: formatResult(dihedralAngle)
   };
 }

@@ -18,11 +18,6 @@ export interface PyramidOutputs {
   bladeTiltMitered: number;
   bladeTiltButted: number;
   dihedralAngle: number;
-  // Table saw constraint checks
-  isMiteredFeasible: boolean;
-  isButtedFeasible: boolean;
-  maxHeightFor45Deg: number; // Maximum height that keeps blade tilt ≤ 45°
-  warnings: string[];
 }
 
 /**
