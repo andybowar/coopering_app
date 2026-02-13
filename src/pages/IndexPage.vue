@@ -7,7 +7,6 @@
           <h5 class="text-h5 q-mt-none q-mb-xs">Pyramid Calculator</h5>
           <p class="text-caption text-grey-7 q-ma-none">
             Table saw angles for N-sided pyramids.
-            An n-sided pyramid is built from n identical triangular side pieces, not including the base. The base radius is the distance from the center of the pyramid's base to one of the base corners. The height is the distance from the center of the base to the apex.
           </p>
         </div>
 
