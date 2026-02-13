@@ -1,26 +1,25 @@
 <template>
-  <q-page class="flex flex-center" style="padding: 20px;">
-    <div class="row justify-center" style="width: 100%; max-width: 1200px;">
-      <div class="col-12 col-md-8 col-lg-6">
+  <q-page class="flex flex-center" style="padding: 16px;">
+    <div class="row justify-center" style="width: 100%; max-width: 600px;">
+      <div class="col-12">
         <!-- Header -->
-        <div class="text-center q-mb-lg">
-          <h3 class="text-h3 q-mt-none q-mb-sm">N-Sided Pyramid Calculator</h3>
-          <p class="text-subtitle1 text-grey-7">
-            For woodworking and construction
+        <div class="text-center q-mb-md">
+          <h5 class="text-h5 q-mt-none q-mb-xs">Pyramid Calculator</h5>
+          <p class="text-caption text-grey-7 q-ma-none">
+            Table saw angles for N-sided pyramids
           </p>
         </div>
 
         <!-- Error Banner -->
-        <q-banner v-if="hasErrors" class="bg-negative text-white q-mb-md" rounded>
+        <q-banner v-if="hasErrors" class="bg-negative text-white q-mb-sm" dense rounded>
           <template v-slot:avatar>
-            <q-icon name="error" />
+            <q-icon name="error" size="sm" />
           </template>
-          <div class="text-subtitle1">Please correct the following errors:</div>
-          <ul class="q-my-sm">
-            <li v-for="(error, index) in state.errors" :key="index">
+          <div class="text-caption">
+            <div v-for="(error, index) in state.errors" :key="index">
               {{ error }}
-            </li>
-          </ul>
+            </div>
+          </div>
         </q-banner>
 
         <!-- Calculator Form -->

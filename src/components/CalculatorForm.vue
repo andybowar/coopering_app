@@ -1,68 +1,50 @@
 <template>
-  <q-card class="q-pa-md">
-    <q-card-section>
-      <div class="text-h6">Input Parameters</div>
+  <q-card flat bordered>
+    <q-card-section class="q-pa-sm">
+      <div class="text-subtitle1 text-weight-medium">Inputs</div>
     </q-card-section>
 
-    <q-card-section>
+    <q-card-section class="q-pa-sm">
       <q-form @submit.prevent="onCalculate">
         <q-input
           v-model.number="localInputs.numberOfSides"
           type="number"
-          filled
-          label="Number of Sides (N)"
-          hint="Minimum 3 sides"
-          :rules="[val => val >= 3 || 'Must be at least 3']"
-          class="q-mb-md"
-        >
-          <template v-slot:prepend>
-            <q-icon name="category" />
-          </template>
-        </q-input>
+          dense
+          outlined
+          label="Sides (N)"
+          :rules="[val => val >= 3 || 'Min 3']"
+          class="q-mb-sm"
+        />
 
         <q-input
           v-model.number="localInputs.baseRadius"
           type="number"
           step="0.01"
-          filled
-          label="Base Radius (R)"
-          hint="Distance from center to vertex"
-          :rules="[val => val > 0 || 'Must be greater than 0']"
-          class="q-mb-md"
-        >
-          <template v-slot:prepend>
-            <q-icon name="straighten" />
-          </template>
-          <template v-slot:append>
-            <span class="text-caption">inches</span>
-          </template>
-        </q-input>
+          dense
+          outlined
+          label="Radius (R)"
+          suffix="in"
+          :rules="[val => val > 0 || 'Must be > 0']"
+          class="q-mb-sm"
+        />
 
         <q-input
           v-model.number="localInputs.height"
           type="number"
           step="0.01"
-          filled
-          label="Pyramid Height (H)"
-          hint="Vertical height from base to apex"
-          :rules="[val => val > 0 || 'Must be greater than 0']"
-          class="q-mb-md"
-        >
-          <template v-slot:prepend>
-            <q-icon name="height" />
-          </template>
-          <template v-slot:append>
-            <span class="text-caption">inches</span>
-          </template>
-        </q-input>
+          dense
+          outlined
+          label="Height (H)"
+          suffix="in"
+          :rules="[val => val > 0 || 'Must be > 0']"
+          class="q-mb-sm"
+        />
 
         <q-btn
           type="submit"
           color="primary"
           label="Calculate"
-          icon="calculate"
           class="full-width"
-          size="lg"
           unelevated
         />
       </q-form>
