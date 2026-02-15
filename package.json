@@ -2,7 +2,7 @@
   "name": "coopering-app",
   "version": "0.0.1",
   "description": "N-Sided Pyramid Calculator for Woodworking",
-  "productName": "Pyramid Calculator",
+  "productName": "Woodworking Calculator",
   "author": "Andy Bowar",
   "private": true,
   "type": "module",
@@ -15,7 +15,11 @@
     "build:pwa": "quasar build -m pwa"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/ios": "^8.1.0",
     "@quasar/extras": "^1.16.4",
+    "cordova": "^13.0.0",
     "quasar": "^2.12.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"

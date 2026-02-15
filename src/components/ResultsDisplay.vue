@@ -2,7 +2,6 @@
   <q-card class="q-mt-md" flat bordered>
     <q-card-section class="q-pa-sm">
       <div class="text-subtitle1 text-weight-medium">Results</div>
-      <div class="text-caption text-grey-7">0° = blade perpendicular to table (max 45°)</div>
     </q-card-section>
 
     <q-card-section class="q-pa-none">
@@ -20,7 +19,7 @@
         <!-- Miter Angle -->
         <q-item dense>
           <q-item-section>
-            <q-item-label caption>Miter Gauge Angle</q-item-label>
+            <q-item-label caption>Miter Angle</q-item-label>
             <q-item-label class="calculation-result text-body1 text-weight-medium">
               {{ results.miterAngle }}°
             </q-item-label>
@@ -94,16 +93,24 @@
 <script setup lang="ts">
 import { Notify } from 'quasar';
 import type { PyramidOutputs } from '../types/pyramid';
+import type { PyramidInputs } from '../types/pyramid';
 
 interface Props {
   results: PyramidOutputs;
+  inputs: PyramidInputs;
 }
 
 const props = defineProps<Props>();
 
 function copyResults(): void {
-  let text = `Pyramid Calculator Results (0° = blade perpendicular, max 45°)
-================================================================
+  let text = `
+Pyramid Calculator Results
+Sides: ${props.inputs.numberOfSides}
+Base Radius: ${props.inputs.baseRadius}"
+Height: ${props.inputs.height}"
+
+Results:
+========
 Base Side Length: ${props.results.baseSideLength}"
 Miter Gauge: ${props.results.miterAngle}°
 Blade Tilt (Mitered): ${props.results.bladeTiltMitered}°}

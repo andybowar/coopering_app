@@ -29,7 +29,19 @@ module.exports = configure(function (/* ctx */) {
     },
 
     framework: {
-      config: {},
+      config: {
+        brand: {
+          primary: '#4a5568',
+          secondary: '#718096',
+          accent: '#9ae6b4',
+          dark: '#2d3748',
+          'dark-page': '#1a202c',
+          positive: '#68d391',
+          negative: '#fc8181',
+          info: '#63b3ed',
+          warning: '#f6ad55'
+        }
+      },
       plugins: ['Notify']
     },
 
@@ -47,8 +59,8 @@ module.exports = configure(function (/* ctx */) {
         json.description = 'Calculate woodworking angles for N-sided pyramids';
         json.display = 'standalone';
         json.orientation = 'portrait';
-        json.background_color = '#ffffff';
-        json.theme_color = '#027BE3';
+        json.background_color = '#1a202c';
+        json.theme_color = '#4a5568';
       },
       workboxOptions: {
         skipWaiting: true,
