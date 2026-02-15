@@ -18,7 +18,6 @@
     "@capacitor/cli": "^8.1.0",
     "@capacitor/core": "^8.1.0",
     "@capacitor/ios": "^8.1.0",
-    "@capacitor/status-bar": "^8.0.1",
     "@quasar/extras": "^1.16.4",
     "cordova": "^13.0.0",
     "quasar": "^2.12.0",
