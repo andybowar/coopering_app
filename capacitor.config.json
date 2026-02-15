@@ -5,5 +5,8 @@
   "server": {
     "androidScheme": "https"
   },
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "ios": {
+    "contentInset": "never"
+  }
 }

@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lff">
-    <q-header elevated class="bg-dark text-white safe-area-header" style="background-color: #2d3748 !important;">
-      <q-toolbar class="safe-area-toolbar">
+    <q-header elevated class="bg-dark text-white ios-safe-header" style="background-color: #2d3748 !important;">
+      <q-toolbar class="ios-safe-toolbar">
         <q-toolbar-title class="text-center">
           Woodworking Calculator
         </q-toolbar-title>
@@ -46,12 +46,14 @@ watch(
 </script>
 
 <style>
-/* iOS safe area support - needs to be global, not scoped */
-.safe-area-header {
-  padding-top: env(safe-area-inset-top) !important;
+/* iOS safe area - works for notch and Dynamic Island */
+.ios-safe-header {
+  /* Add top padding to clear notch/Dynamic Island */
+  padding-top: 50px !important;
 }
 
-.safe-area-toolbar {
+.ios-safe-toolbar {
+  /* Ensure toolbar has minimum height */
   min-height: 50px !important;
 }
 
@@ -60,8 +62,8 @@ watch(
   flex: 1;
 }
 
-/* Ensure page container also respects safe areas */
-.q-layout__section--marginal {
+/* Add safe area padding to page content as well */
+.q-page {
   padding-top: env(safe-area-inset-top);
 }
 </style>

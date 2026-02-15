@@ -6,22 +6,6 @@ body {
   color: #e2e8f0;
 }
 
-/* iOS Safe Area Support */
-body {
-  padding-top: constant(safe-area-inset-top); /* iOS 11.0 */
-  padding-top: env(safe-area-inset-top); /* iOS 11.2+ */
-}
-
-.q-header {
-  padding-top: constant(safe-area-inset-top) !important;
-  padding-top: env(safe-area-inset-top) !important;
-}
-
-.q-layout__section--marginal {
-  padding-top: constant(safe-area-inset-top) !important;
-  padding-top: env(safe-area-inset-top) !important;
-}
-
 .q-page {
   background-color: #1a202c;
 }
