@@ -1,8 +1,8 @@
 <template>
   <q-layout view="lHh Lpr lff">
-    <q-header elevated class="bg-dark text-white" style="background-color: #2d3748 !important;">
-      <q-toolbar>
-        <q-toolbar-title>
+    <q-header elevated class="bg-dark text-white safe-area-header" style="background-color: #2d3748 !important;">
+      <q-toolbar class="safe-area-toolbar">
+        <q-toolbar-title class="text-center">
           Woodworking Calculator
         </q-toolbar-title>
       </q-toolbar>
@@ -44,3 +44,24 @@ watch(
   { immediate: true }
 );
 </script>
+
+<style>
+/* iOS safe area support - needs to be global, not scoped */
+.safe-area-header {
+  padding-top: env(safe-area-inset-top) !important;
+}
+
+.safe-area-toolbar {
+  min-height: 50px !important;
+}
+
+.q-toolbar-title {
+  text-align: center;
+  flex: 1;
+}
+
+/* Ensure page container also respects safe areas */
+.q-layout__section--marginal {
+  padding-top: env(safe-area-inset-top);
+}
+</style>

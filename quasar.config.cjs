@@ -42,7 +42,7 @@ module.exports = configure(function (/* ctx */) {
           warning: '#f6ad55'
         }
       },
-      plugins: ['Notify']
+      plugins: ['Notify', 'Dark']
     },
 
     animations: [],
