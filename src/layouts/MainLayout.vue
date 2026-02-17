@@ -62,8 +62,15 @@ watch(
   flex: 1;
 }
 
-/* Add safe area padding to page content as well */
+/* Add safe area padding to page content */
 .q-page {
   padding-top: env(safe-area-inset-top);
+  /* Add bottom padding for iOS banner ad (60px to account for 50px banner + spacing) */
+  padding-bottom: 60px !important;
+}
+
+/* Ensure page container also respects bottom padding */
+.q-page-container {
+  padding-bottom: 60px !important;
 }
 </style>

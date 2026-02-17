@@ -1,14 +1,75 @@
 import UIKit
 import Capacitor
+import GoogleMobileAds
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var bannerView: BannerView!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Initialize Google Mobile Ads SDK
+        MobileAds.shared.start { status in
+            print("AdMob initialized")
+        }
+
+        // Add banner ad after a short delay to ensure window is ready
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.addBannerView()
+        }
+
         return true
+    }
+
+    func addBannerView() {
+        guard let window = window,
+              let rootViewController = window.rootViewController else {
+            return
+        }
+
+        // Create banner view with real ad unit ID
+        bannerView = BannerView(adSize: AdSizeBanner)
+        bannerView.adUnitID = "ca-app-pub-5844342294171768/3632291389"
+        bannerView.rootViewController = rootViewController
+
+        // Position at bottom of screen
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
+        window.addSubview(bannerView)
+
+        NSLayoutConstraint.activate([
+            bannerView.bottomAnchor.constraint(equalTo: window.safeAreaLayoutGuide.bottomAnchor),
+            bannerView.centerXAnchor.constraint(equalTo: window.centerXAnchor)
+        ])
+
+        // Add bottom padding to the web view to avoid overlap with banner
+        // Standard banner height is 50 points
+        let bannerHeight: CGFloat = 50
+        rootViewController.additionalSafeAreaInsets = UIEdgeInsets(
+            top: 0,
+            left: 0,
+            bottom: bannerHeight,
+            right: 0
+        )
+
+        // Inject CSS to add bottom padding to the web content
+        if let bridge = (rootViewController as? CAPBridgeViewController) {
+            let css = """
+                body, #app, .q-page-container {
+                    padding-bottom: 60px !important;
+                }
+            """
+            let js = """
+                var style = document.createElement('style');
+                style.innerHTML = '\(css)';
+                document.head.appendChild(style);
+            """
+            bridge.webView?.evaluateJavaScript(js, completionHandler: nil)
+        }
+
+        // Load ad
+        let request = Request()
+        bannerView.load(request)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
