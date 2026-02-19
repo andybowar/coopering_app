@@ -37,3 +37,14 @@ export interface CalculationState {
   isCalculated: boolean;
   errors: string[];
 }
+
+/**
+ * Saved calculation for history
+ */
+export interface SavedCalculation {
+  id: string;
+  name: string;
+  timestamp: number;
+  inputs: PyramidInputs;
+  outputs: PyramidOutputs;
+}

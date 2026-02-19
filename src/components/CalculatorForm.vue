@@ -40,6 +40,13 @@
           class="q-mb-sm"
         />
 
+        <q-checkbox
+          v-model="saveCalculation"
+          label="Save this calculation"
+          class="q-mb-sm"
+          dense
+        />
+
         <q-btn
           type="submit"
           color="primary"
@@ -53,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import type { PyramidInputs } from '../types/pyramid';
 
 interface Props {
@@ -62,7 +69,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:modelValue', value: PyramidInputs): void;
-  (e: 'calculate'): void;
+  (e: 'calculate', payload: { save: boolean }): void;
 }
 
 const props = defineProps<Props>();
@@ -70,6 +77,9 @@ const emit = defineEmits<Emits>();
 
 // Local copy of inputs for v-model binding
 const localInputs = reactive<PyramidInputs>({ ...props.modelValue });
+
+// Save calculation checkbox state
+const saveCalculation = ref(false);
 
 // Watch for changes and emit updates
 watch(
@@ -90,6 +100,8 @@ watch(
 );
 
 function onCalculate(): void {
-  emit('calculate');
+  emit('calculate', { save: saveCalculation.value });
+  // Reset checkbox after calculation
+  saveCalculation.value = false;
 }
 </script>
