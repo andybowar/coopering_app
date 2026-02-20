@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <div class="col-12" style="max-width: 600px;">
         <!-- Header -->
-        <div class="text-center q-mb-md">
+        <div class="text-center q-mb-md q-mt-md">
           <h5 class="text-h5 q-mt-none q-mb-xs">Calculator History</h5>
           <p class="text-caption text-grey-7 q-ma-none">
             View and manage your saved calculations
