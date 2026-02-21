@@ -90,6 +90,49 @@
           </q-item>
         </q-expansion-item>
 
+        <q-expansion-item
+          expand-separator
+          label="Trigonometry Solver"
+          :default-opened="isTrigRoute"
+        >
+          <template v-slot:header>
+            <q-item-section avatar>
+              <right-triangle-icon />
+            </q-item-section>
+            <q-item-section>
+              Trigonometry Solver
+            </q-item-section>
+          </template>
+
+          <q-item
+            clickable
+            :active="route.path === '/trig-right'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/trig-right')"
+          >
+            <q-item-section avatar>
+              <right-triangle-icon />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Right Triangle</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/trig-general'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/trig-general')"
+          >
+            <q-item-section avatar>
+              <triangle-icon />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Regular Triangle</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-expansion-item>
+
         <q-item
           clickable
           :active="route.path === '/reference'"
@@ -117,14 +160,20 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TrapezoidIcon from '../components/TrapezoidIcon.vue';
 import TriangleIcon from '../components/TriangleIcon.vue';
+import RightTriangleIcon from '../components/RightTriangleIcon.vue';
 
 const route = useRoute();
 const router = useRouter();
 const drawerOpen = ref(false);
 
-// Check if current route is under calculator section (/, /pyramid, or /saved-calculations)
+// Check if current route is under calculator section
 const isCalculatorRoute = computed(() => {
   return route.path === '/' || route.path === '/pyramid' || route.path === '/saved-calculations';
+});
+
+// Check if current route is under trigonometry section
+const isTrigRoute = computed(() => {
+  return route.path === '/trig-right' || route.path === '/trig-general';
 });
 
 // Navigate and close drawer
