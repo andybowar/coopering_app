@@ -4,19 +4,21 @@
       <div class="col-12">
         <!-- Header -->
         <div class="text-center q-mb-md">
-          <h5 class="text-h5 q-mt-none q-mb-xs">Coopering Calculator</h5>
+          <h5 class="text-h5 q-mt-none q-mb-xs">Pyramid Calculator</h5>
           <p class="text-grey-7 q-ma-none">
-            An n-sided pyramid is built from n identical triangular side pieces, not including the base.
+            An n-sided pyramid is built from n identical triangular side pieces, not including the base. This calculator is for a regular pyramid, where all side pieces are identical and go from an open base on one end to a point on the other end.
           </p>
           <br />
+          <div class="text-subtitle1 text-weight-medium q-mt-md q-mb-xs">Base Radius</div>
           <p class="text-grey-7 q-ma-none q-mb-sm">
             The base radius is the distance from the center of the pyramid's base to one of the base corners. If you think about the base as a polygon contained in a circle, the base radius is the radius of that circle.
           </p>
-          <img src="/radius_illustration.jpg" alt="Base Radius Illustration" class="illustration-image q-mb-sm">
+          <img src="/pyramid_radius_illustration.jpg" alt="Base Radius Illustration" class="illustration-image q-mb-sm">
+          <div class="text-subtitle1 text-weight-medium q-mt-md q-mb-xs">Height</div>
           <p class="text-grey-7 q-ma-none q-mb-sm">
             The height is the distance from the bottom of the pyramid to the top. It should not be confused with the length of the side pieces.
           </p>
-          <img src="/height_illustration.jpg" alt="Height Illustration" class="illustration-image">
+          <img src="/pyramid_height_illustration.jpg" alt="Height Illustration" class="illustration-image">
         </div>
 
         <!-- Error Banner -->
@@ -77,7 +79,7 @@
 
               <div class="definition-item q-pa-sm q-mb-xs">
                 <div class="definition-term">Dihedral Angle</div>
-                <div class="definition-text">The angle between two surface planes. We compute the inside dihedral angle, which is always ≤180°. A block that fits snugly between the two surfaces can be cut with the miter angle set to the dihedral angle minus 90° and with zero blade tilt.</div>
+                <div class="definition-text">The angle where two pyramid sides meet (like opening a book). This is measured on the inside and is always 180° or less. To cut a filler block that fits perfectly in this corner, set your miter gauge to (dihedral angle - 90°) with the blade at 0° tilt.</div>
               </div>
 
               <div class="definition-item q-pa-sm q-mb-xs">

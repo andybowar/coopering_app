@@ -11,7 +11,7 @@
           aria-label="Menu"
         />
         <q-toolbar-title class="text-center">
-          Woodworking Calculator
+          Coopering Calculator
         </q-toolbar-title>
         <!-- Spacer to center title -->
         <q-btn flat dense round icon="menu" style="visibility: hidden;" />
@@ -44,7 +44,7 @@
         <q-expansion-item
           expand-separator
           icon="calculate"
-          label="Coopering"
+          label="Calculators"
           :default-opened="isCalculatorRoute"
         >
           <q-item
@@ -54,24 +54,38 @@
             @click="navigateTo('/')"
           >
             <q-item-section avatar>
-              <q-icon name="calculate" />
+              <trapezoid-icon />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Calculator</q-item-label>
+              <q-item-label>Box</q-item-label>
             </q-item-section>
           </q-item>
 
           <q-item
             clickable
-            :active="route.path === '/history'"
+            :active="route.path === '/pyramid'"
             active-class="bg-primary text-white"
-            @click="navigateTo('/history')"
+            @click="navigateTo('/pyramid')"
+          >
+            <q-item-section avatar>
+              <triangle-icon />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Pyramid</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/saved-calculations'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/saved-calculations')"
           >
             <q-item-section avatar>
               <q-icon name="history" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Calculator History</q-item-label>
+              <q-item-label>Saved Calculations</q-item-label>
             </q-item-section>
           </q-item>
         </q-expansion-item>
@@ -101,14 +115,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import TrapezoidIcon from '../components/TrapezoidIcon.vue';
+import TriangleIcon from '../components/TriangleIcon.vue';
 
 const route = useRoute();
 const router = useRouter();
 const drawerOpen = ref(false);
 
-// Check if current route is under calculator section (/ or /history)
+// Check if current route is under calculator section (/, /pyramid, or /saved-calculations)
 const isCalculatorRoute = computed(() => {
-  return route.path === '/' || route.path === '/history';
+  return route.path === '/' || route.path === '/pyramid' || route.path === '/saved-calculations';
 });
 
 // Navigate and close drawer
@@ -122,7 +138,8 @@ function navigateTo(path: string): void {
 /* iOS safe area - works for notch and Dynamic Island */
 .ios-safe-header {
   /* Use env() to properly respect notch/Dynamic Island on all devices */
-  padding-top: env(safe-area-inset-top, 50px) !important;
+  /* Increased fallback to 60px to account for Dynamic Island/notch */
+  padding-top: max(env(safe-area-inset-top), 60px) !important;
 }
 
 .ios-safe-toolbar {

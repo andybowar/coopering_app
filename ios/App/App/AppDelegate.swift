@@ -6,7 +6,7 @@ import GoogleMobileAds
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var bannerView: GADBannerView!
+    var bannerView: BannerView!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Initialize Google Mobile Ads SDK
@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // Create banner view with real ad unit ID
-        bannerView = GADBannerView(adSize: GADAdSizeBanner)
+        bannerView = BannerView(adSize: AdSizeBanner)
         bannerView.adUnitID = "ca-app-pub-5844342294171768/3632291389"
         bannerView.rootViewController = rootViewController
 
@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // Load ad
-        let request = GADRequest()
+        let request = Request()
         bannerView.load(request)
     }
 
