@@ -77,6 +77,24 @@
 
           <q-item
             clickable
+            :active="route.path === '/curve-coop'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/curve-coop')"
+          >
+            <q-item-section avatar>
+              <q-icon>
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path d="M4 6 Q 12 18, 20 6" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Curve Coopering</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
             :active="route.path === '/saved-calculations'"
             active-class="bg-primary text-white"
             @click="navigateTo('/saved-calculations')"
@@ -168,7 +186,7 @@ const drawerOpen = ref(false);
 
 // Check if current route is under calculator section
 const isCalculatorRoute = computed(() => {
-  return route.path === '/' || route.path === '/pyramid' || route.path === '/saved-calculations';
+  return route.path === '/' || route.path === '/pyramid' || route.path === '/curve-coop' || route.path === '/saved-calculations';
 });
 
 // Check if current route is under trigonometry section
@@ -204,6 +222,8 @@ function navigateTo(path: string): void {
 /* Drawer toolbar styling */
 .drawer-toolbar {
   min-height: 56px !important;
+  /* Add safe area padding for notch/Dynamic Island */
+  padding-top: max(env(safe-area-inset-top), 60px) !important;
 }
 
 /* Add safe area padding to page content */
