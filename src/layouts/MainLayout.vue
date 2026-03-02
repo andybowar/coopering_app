@@ -41,26 +41,27 @@
       <q-separator dark />
 
       <q-list dark>
+        <!-- Home -->
+        <q-item
+          clickable
+          :active="route.path === '/'"
+          active-class="bg-primary text-white"
+          @click="navigateTo('/')"
+        >
+          <q-item-section avatar>
+            <q-icon name="home" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Home</q-item-label>
+          </q-item-section>
+        </q-item>
+
         <q-expansion-item
           expand-separator
           icon="calculate"
           label="Calculators"
           :default-opened="isCalculatorRoute"
         >
-          <q-item
-            clickable
-            :active="route.path === '/'"
-            active-class="bg-primary text-white"
-            @click="navigateTo('/')"
-          >
-            <q-item-section avatar>
-              <trapezoid-icon />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Box</q-item-label>
-            </q-item-section>
-          </q-item>
-
           <q-item
             clickable
             :active="route.path === '/pyramid'"
@@ -77,9 +78,23 @@
 
           <q-item
             clickable
-            :active="route.path === '/curve-coop'"
+            :active="route.path === '/box'"
             active-class="bg-primary text-white"
-            @click="navigateTo('/curve-coop')"
+            @click="navigateTo('/box')"
+          >
+            <q-item-section avatar>
+              <trapezoid-icon />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Box</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/curve'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/curve')"
           >
             <q-item-section avatar>
               <q-icon>
@@ -90,6 +105,34 @@
             </q-item-section>
             <q-item-section>
               <q-item-label>Curve Coopering</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/cylinder'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/cylinder')"
+          >
+            <q-item-section avatar>
+              <q-icon name="fiber_manual_record" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Cylinder</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/ellipse'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/ellipse')"
+          >
+            <q-item-section avatar>
+              <q-icon name="panorama_fish_eye" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Ellipse</q-item-label>
             </q-item-section>
           </q-item>
 
@@ -186,7 +229,7 @@ const drawerOpen = ref(false);
 
 // Check if current route is under calculator section
 const isCalculatorRoute = computed(() => {
-  return route.path === '/' || route.path === '/pyramid' || route.path === '/curve-coop' || route.path === '/saved-calculations';
+  return route.path === '/pyramid' || route.path === '/box' || route.path === '/curve' || route.path === '/cylinder' || route.path === '/ellipse' || route.path === '/saved-calculations';
 });
 
 // Check if current route is under trigonometry section

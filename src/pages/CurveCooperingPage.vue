@@ -6,7 +6,7 @@
         <div class="text-center q-mb-md">
           <h5 class="text-h5 q-mt-md q-mb-xs">Curve Coopering</h5>
           <p class="text-grey-7 q-ma-none">
-            Calculate blade tilt angles for circular arcs or cylinders. Perfect for curved chair seats or cylindrical projects.
+            Calculate blade tilt angles for circular arcs. Perfect for curved chair seats.
           </p>
         </div>
 
@@ -27,22 +27,6 @@
           <q-card-section class="q-pa-sm">
             <div class="text-subtitle2 text-weight-medium q-mb-sm">Parameters</div>
             <q-form @submit.prevent="calculate">
-              <!-- Mode Selector -->
-              <div class="q-mb-sm">
-                <div class="text-caption text-grey-7 q-mb-xs">Mode:</div>
-                <q-btn-toggle
-                  v-model="state.inputs.mode"
-                  :options="[
-                    { label: 'Arc', value: 'radius' },
-                    { label: 'Cylinder', value: 'cylinder' }
-                  ]"
-                  spread
-                  toggle-color="primary"
-                  toggle-text-color="white"
-                  @update:model-value="handleModeChange"
-                />
-              </div>
-
               <!-- Angle Precision Selector -->
               <div class="q-mb-sm row items-center">
                 <div class="text-caption text-grey-7 q-mr-sm">Angle precision:</div>
@@ -59,8 +43,8 @@
                 />
               </div>
 
-              <!-- Arc Mode Inputs -->
-              <div v-if="state.inputs.mode === 'radius'">
+              <!-- Arc Inputs -->
+              <div>
                 <q-input
                   v-model.number="state.inputs.totalLength"
                   type="number"
@@ -73,7 +57,25 @@
                   :rules="[val => val > 0 || 'Must be > 0']"
                 />
 
+                <!-- Radius Specification Method -->
+                <div class="q-mb-sm">
+                  <div class="text-caption text-grey-7 q-mb-xs">Specify radius by:</div>
+                  <q-btn-toggle
+                    v-model="radiusSpecMode"
+                    :options="[
+                      { label: 'Known Radius', value: 'known' },
+                      { label: 'Chord + Sagitta', value: 'sagitta' }
+                    ]"
+                    spread
+                    toggle-color="green"
+                    toggle-text-color="black"
+                    class="q-mb-sm"
+                    @update:model-value="handleRadiusSpecChange"
+                  />
+                </div>
+
                 <q-input
+                  v-if="radiusSpecMode === 'known'"
                   v-model.number="state.inputs.radius"
                   type="number"
                   step="0.1"
@@ -82,6 +84,20 @@
                   :label="state.inputs.useTaper ? 'Front Radius' : 'Radius'"
                   suffix="in"
                   class="q-mb-sm"
+                  :rules="[val => val > 0 || 'Must be > 0']"
+                />
+
+                <q-input
+                  v-if="radiusSpecMode === 'sagitta'"
+                  v-model.number="sagitta"
+                  type="number"
+                  step="0.1"
+                  dense
+                  outlined
+                  label="Sagitta (Arc Height)"
+                  suffix="in"
+                  class="q-mb-sm"
+                  hint="Height from chord to arc peak"
                   :rules="[val => val > 0 || 'Must be > 0']"
                 />
 
@@ -95,8 +111,25 @@
                   />
                 </div>
 
+                <!-- Back Radius Specification (only for taper mode) -->
+                <div v-if="state.inputs.useTaper" class="q-mb-sm">
+                  <div class="text-caption text-grey-7 q-mb-xs">Specify back radius by:</div>
+                  <q-btn-toggle
+                    v-model="backRadiusSpecMode"
+                    :options="[
+                      { label: 'Known Radius', value: 'known' },
+                      { label: 'Chord + Sagitta', value: 'sagitta' }
+                    ]"
+                    spread
+                    toggle-color="green"
+                    toggle-text-color="black"
+                    class="q-mb-sm"
+                    @update:model-value="handleBackRadiusSpecChange"
+                  />
+                </div>
+
                 <q-input
-                  v-if="state.inputs.useTaper"
+                  v-if="state.inputs.useTaper && backRadiusSpecMode === 'known'"
                   v-model.number="state.inputs.backRadius"
                   type="number"
                   step="0.1"
@@ -105,6 +138,20 @@
                   label="Back Radius"
                   suffix="in"
                   class="q-mb-sm"
+                  :rules="[val => val > 0 || 'Must be > 0']"
+                />
+
+                <q-input
+                  v-if="state.inputs.useTaper && backRadiusSpecMode === 'sagitta'"
+                  v-model.number="backSagitta"
+                  type="number"
+                  step="0.1"
+                  dense
+                  outlined
+                  label="Back Sagitta (Arc Height)"
+                  suffix="in"
+                  class="q-mb-sm"
+                  hint="Height from chord to back arc peak"
                   :rules="[val => val > 0 || 'Must be > 0']"
                 />
 
@@ -121,7 +168,25 @@
                   :rules="[val => val > 0 || 'Must be > 0']"
                 />
 
+                <!-- Calculation Mode -->
+                <div class="q-mb-sm">
+                  <div class="text-caption text-grey-7 q-mb-xs">I know the:</div>
+                  <q-btn-toggle
+                    v-model="calculationMode"
+                    :options="[
+                      { label: 'Number of Staves', value: 'width' },
+                      { label: 'Stave Width', value: 'count' }
+                    ]"
+                    spread
+                    toggle-color="green"
+                    toggle-text-color="black"
+                    class="q-mb-sm"
+                    @update:model-value="handleCalculationModeChange"
+                  />
+                </div>
+
                 <q-input
+                  v-if="calculationMode === 'width'"
                   v-model.number="state.inputs.numberOfStaves"
                   type="number"
                   step="1"
@@ -129,57 +194,13 @@
                   outlined
                   label="Number of Staves"
                   class="q-mb-sm"
+                  hint="Will calculate stave width"
                   :rules="[val => val >= 2 || 'Min 2 staves']"
                 />
 
                 <q-input
-                  v-model.number="state.inputs.staveThickness"
-                  type="number"
-                  step="0.001"
-                  dense
-                  outlined
-                  label="Stave Thickness (optional)"
-                  suffix="in"
-                  class="q-mb-sm"
-                  hint="Leave blank if not needed"
-                />
-              </div>
-
-              <!-- Cylinder Mode Inputs -->
-              <div v-if="state.inputs.mode === 'cylinder'">
-                <!-- Calculation Direction -->
-                <div class="q-mb-sm">
-                  <div class="text-caption text-grey-7 q-mb-xs">Calculate from:</div>
-                  <q-btn-toggle
-                    v-model="state.inputs.cylinderCalcMode"
-                    :options="[
-                      { label: 'Diameter', value: 'fromDiameter' },
-                      { label: 'Stave Width', value: 'fromStaveWidth' }
-                    ]"
-                    spread
-                    toggle-color="green"
-                    toggle-text-color="black"
-                    class="q-mb-sm"
-                    @update:model-value="handleCylinderModeChange"
-                  />
-                </div>
-
-                <q-input
-                  v-if="state.inputs.cylinderCalcMode === 'fromDiameter'"
-                  v-model.number="state.inputs.diameter"
-                  type="number"
-                  step="0.1"
-                  dense
-                  outlined
-                  label="Diameter"
-                  suffix="in"
-                  class="q-mb-sm"
-                  :rules="[val => val > 0 || 'Must be > 0']"
-                />
-
-                <q-input
-                  v-if="state.inputs.cylinderCalcMode === 'fromStaveWidth'"
-                  v-model.number="state.inputs.staveWidth"
+                  v-if="calculationMode === 'count'"
+                  v-model.number="desiredStaveWidth"
                   type="number"
                   step="0.1"
                   dense
@@ -187,18 +208,8 @@
                   label="Stave Width"
                   suffix="in"
                   class="q-mb-sm"
+                  hint="Will calculate number of staves needed"
                   :rules="[val => val > 0 || 'Must be > 0']"
-                />
-
-                <q-input
-                  v-model.number="state.inputs.numberOfStaves"
-                  type="number"
-                  step="1"
-                  dense
-                  outlined
-                  label="Number of Staves"
-                  class="q-mb-sm"
-                  :rules="[val => val >= 3 || 'Min 3 staves for cylinder']"
                 />
 
                 <q-input
@@ -239,66 +250,94 @@
           </q-card-section>
         </q-card>
 
-        <!-- Results Card - Arc Mode -->
-        <q-card v-if="hasResults && state.outputs && state.inputs.mode === 'radius'" flat bordered>
+        <!-- Results Card -->
+        <q-card v-if="hasResults && state.outputs" flat bordered>
           <q-card-section class="q-pa-sm">
             <div class="text-subtitle2 text-weight-medium q-mb-sm">Results</div>
 
             <!-- Visualization -->
             <div class="visualization-container q-mb-md">
-              <div class="text-caption text-grey-7 q-mb-xs">Cross-Section View</div>
-              <svg viewBox="0 0 400 280" class="cross-section-svg">
-                <!-- Draw the curve (no additional smoothing, just the normalized points) -->
-                <path
-                  :d="getCurvePath()"
-                  fill="none"
-                  stroke="#1976d2"
-                  stroke-width="3"
-                />
-
-                <!-- Draw stave lines -->
-                <line
-                  v-for="(point, index) in state.outputs.normalizedPoints"
-                  :key="'stave-' + index"
-                  v-if="index < state.outputs.normalizedPoints.length - 1"
-                  :x1="getScaledX(point.x)"
-                  :y1="getScaledY(point.y)"
-                  :x2="getScaledX(state.outputs.normalizedPoints[index + 1].x)"
-                  :y2="getScaledY(state.outputs.normalizedPoints[index + 1].y)"
-                  stroke="#90caf9"
-                  stroke-width="2"
-                  opacity="0.5"
-                />
-
-                <!-- Draw angle bisectors with labels at joints -->
-                <g
-                  v-for="(bisector, index) in getAngleBisectors()"
-                  :key="'bisector-' + index"
-                >
-                  <!-- Bisector line -->
-                  <line
-                    :x1="bisector.x1"
-                    :y1="bisector.y1"
-                    :x2="bisector.x2"
-                    :y2="bisector.y2"
-                    stroke="#f57c00"
-                    stroke-width="2"
-                    stroke-dasharray="4,2"
+              <div class="text-caption text-grey-7 q-mb-xs">
+                Cross-Section View
+                <span class="text-grey-6"> • Pinch to zoom • Double tap to reset</span>
+              </div>
+              <svg ref="svgRef" viewBox="0 0 400 280" class="cross-section-svg">
+                <g :transform="transformAttr(200, 140)">
+                  <!-- Draw the curve (no additional smoothing, just the normalized points) -->
+                  <path
+                    :d="getCurvePath()"
+                    fill="none"
+                    stroke="#1976d2"
+                    stroke-width="3"
                   />
-                  <!-- Angle label -->
-                  <text
-                    :x="bisector.labelX"
-                    :y="bisector.labelY"
-                    text-anchor="middle"
-                    class="angle-label-svg"
+
+                  <!-- Draw stave lines -->
+                  <line
+                    v-for="(point, index) in state.outputs.normalizedPoints"
+                    :key="'stave-' + index"
+                    v-if="index < state.outputs.normalizedPoints.length - 1"
+                    :x1="getScaledX(point.x)"
+                    :y1="getScaledY(point.y)"
+                    :x2="getScaledX(state.outputs.normalizedPoints[index + 1].x)"
+                    :y2="getScaledY(state.outputs.normalizedPoints[index + 1].y)"
+                    stroke="#90caf9"
+                    stroke-width="2"
+                    opacity="0.5"
+                  />
+
+                  <!-- Draw angle bisectors with labels at joints -->
+                  <g
+                    v-for="(bisector, index) in getAngleBisectors()"
+                    :key="'bisector-' + index"
                   >
-                    {{ bisector.angle }}°
-                  </text>
+                    <!-- Bisector line -->
+                    <line
+                      :x1="bisector.x1"
+                      :y1="bisector.y1"
+                      :x2="bisector.x2"
+                      :y2="bisector.y2"
+                      stroke="#f57c00"
+                      stroke-width="2"
+                      stroke-dasharray="4,2"
+                    />
+                    <!-- Angle label -->
+                    <text
+                      :x="bisector.labelX"
+                      :y="bisector.labelY"
+                      text-anchor="middle"
+                      class="angle-label-svg"
+                      :transform="`scale(${inverseScale()})`"
+                      :transform-origin="`${bisector.labelX} ${bisector.labelY}`"
+                    >
+                      {{ bisector.angle }}°
+                    </text>
+                  </g>
                 </g>
               </svg>
               <div class="text-caption text-grey-7 text-center q-mt-xs">
                 Blue: coopering shape | Light blue: staves | Orange: angle bisectors with blade tilt
               </div>
+            </div>
+
+            <!-- Calculated Values -->
+            <div v-if="radiusSpecMode === 'sagitta' || (state.inputs.useTaper && backRadiusSpecMode === 'sagitta') || calculationMode === 'count'" class="q-mb-md">
+              <div class="text-subtitle2 text-weight-medium q-mb-sm">Calculated Values</div>
+              <q-card flat bordered class="q-pa-md">
+                <div class="row q-col-gutter-md">
+                  <div v-if="radiusSpecMode === 'sagitta'" class="col">
+                    <div class="text-caption text-grey-6">{{ state.inputs.useTaper ? 'Calculated Front Radius' : 'Calculated Radius' }}</div>
+                    <div class="text-h6 text-weight-bold">{{ state.inputs.radius?.toFixed(4) }}"</div>
+                  </div>
+                  <div v-if="state.inputs.useTaper && backRadiusSpecMode === 'sagitta'" class="col">
+                    <div class="text-caption text-grey-6">Calculated Back Radius</div>
+                    <div class="text-h6 text-weight-bold">{{ state.inputs.backRadius?.toFixed(4) }}"</div>
+                  </div>
+                  <div v-if="calculationMode === 'count'" class="col">
+                    <div class="text-caption text-grey-6">Calculated Staves</div>
+                    <div class="text-h6 text-weight-bold">{{ state.inputs.numberOfStaves }}</div>
+                  </div>
+                </div>
+              </q-card>
             </div>
 
             <div class="q-mb-md">
@@ -381,117 +420,6 @@
           </q-card-actions>
         </q-card>
 
-        <!-- Results Card - Cylinder Mode -->
-        <q-card v-if="hasResults && state.cylinderResults && state.inputs.mode === 'cylinder'" flat bordered>
-          <q-card-section class="q-pa-sm">
-            <div class="text-subtitle2 text-weight-medium q-mb-sm">Results</div>
-
-            <!-- Cylinder Visualization -->
-            <div class="visualization-container q-mb-md">
-              <div class="text-caption text-grey-7 q-mb-xs">Cross-Section View</div>
-              <svg viewBox="0 0 400 280" class="cross-section-svg">
-                <!-- Draw the circle -->
-                <circle
-                  cx="200"
-                  cy="140"
-                  r="100"
-                  fill="none"
-                  stroke="#1976d2"
-                  stroke-width="3"
-                />
-
-                <!-- Draw stave division lines and angle markers -->
-                <g v-for="i in state.cylinderResults.numberOfStaves" :key="'stave-' + i">
-                  <!-- Stave division line -->
-                  <line
-                    :x1="200 + 100 * Math.cos((i - 1) * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    :y1="140 + 100 * Math.sin((i - 1) * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    :x2="200 + 100 * Math.cos(i * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    :y2="140 + 100 * Math.sin(i * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    stroke="#90caf9"
-                    stroke-width="2"
-                    opacity="0.5"
-                  />
-
-                  <!-- Short angle marker line outside the circle -->
-                  <line
-                    :x1="200 + 100 * Math.cos(i * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    :y1="140 + 100 * Math.sin(i * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    :x2="200 + 125 * Math.cos(i * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    :y2="140 + 125 * Math.sin(i * 2 * Math.PI / state.cylinderResults.numberOfStaves)"
-                    stroke="#f57c00"
-                    stroke-width="2"
-                    stroke-dasharray="4,2"
-                  />
-                </g>
-
-                <!-- Center label for blade tilt -->
-                <text
-                  x="200"
-                  y="140"
-                  text-anchor="middle"
-                  dominant-baseline="middle"
-                  class="angle-label-svg"
-                  style="font-size: 14px;"
-                >
-                  {{ state.cylinderResults.bladeTiltAngle }}°
-                </text>
-              </svg>
-              <div class="text-caption text-grey-7 text-center q-mt-xs">
-                Blue: cylinder outline | Light blue: staves | Orange: angle markers at joints
-              </div>
-            </div>
-
-            <div class="q-mb-md">
-              <div class="text-subtitle2 text-weight-medium q-mb-sm">Cylinder Dimensions</div>
-              <div class="text-caption text-grey-7 q-mb-md">
-                Cut {{ state.cylinderResults.numberOfStaves }} staves using the following information:
-              </div>
-
-              <q-card flat bordered class="q-pa-md">
-                <div class="row q-col-gutter-md" :class="{ 'q-mb-md': state.cylinderResults.convexWidth }">
-                  <div class="col">
-                    <div class="text-caption text-grey-6">Diameter</div>
-                    <div class="text-h6 text-weight-bold">{{ state.cylinderResults.diameter }}"</div>
-                  </div>
-                  <div class="col">
-                    <div class="text-caption text-grey-6">{{ state.cylinderResults.convexWidth ? 'Concave Width' : 'Stave Width' }}</div>
-                    <div class="text-h6 text-weight-bold">{{ state.cylinderResults.staveWidth }}"</div>
-                  </div>
-                  <div class="col">
-                    <div class="text-caption text-grey-6">Blade Tilt</div>
-                    <div class="text-h6 text-weight-bold">{{ state.cylinderResults.bladeTiltAngle }}°</div>
-                  </div>
-                </div>
-                <div v-if="state.cylinderResults.convexWidth" class="row q-col-gutter-md">
-                  <div class="col">
-                    <!-- Empty for spacing -->
-                  </div>
-                  <div class="col">
-                    <div class="text-caption text-grey-6">Convex Width</div>
-                    <div class="text-h6 text-weight-bold">{{ state.cylinderResults.convexWidth }}"</div>
-                  </div>
-                  <div class="col">
-                    <!-- Empty for spacing -->
-                  </div>
-                </div>
-              </q-card>
-            </div>
-          </q-card-section>
-
-          <q-card-actions align="center" class="q-pa-sm">
-            <q-btn
-              flat
-              dense
-              color="primary"
-              label="Copy Results"
-              icon="content_copy"
-              size="sm"
-              @click="copyCylinderResults"
-            />
-          </q-card-actions>
-        </q-card>
-
         <!-- Help Section -->
         <q-card flat bordered class="q-mt-md">
           <q-expansion-item
@@ -508,23 +436,23 @@
                   This tool calculates blade tilt angles for curved coopering projects. The blade tilt is half of the joint angle (e.g., 90° joint = 45° blade tilt).
                 </p>
                 <p class="q-ma-none q-mb-xs">
-                  <strong>Arc Mode:</strong> Perfect for circular arcs like chair seats.
+                  <strong>Basic Usage:</strong>
                 </p>
                 <ol class="q-ma-none q-pl-md q-mb-sm">
-                  <li>Enter the radius (e.g., 95" for a chair)</li>
-                  <li>Enter the arc width and number of staves</li>
-                  <li>Click Calculate - all staves will have identical angles</li>
-                  <li>Optional: Enable tapered mode for projects with different front and back radii</li>
+                  <li>Enter the chord length (overall width)</li>
+                  <li>Enter the radius OR specify chord + sagitta (arc height)</li>
+                  <li>Enter number of staves OR desired stave width</li>
+                  <li>Click Calculate</li>
                 </ol>
                 <p class="q-ma-none q-mb-xs">
-                  <strong>Cylinder Mode:</strong> For cylindrical projects like vessels or columns.
+                  <strong>Advanced Options:</strong>
                 </p>
-                <ol class="q-ma-none q-pl-md">
-                  <li>Choose calculation direction: from diameter or from stave width</li>
-                  <li>Enter the known dimension and number of staves</li>
-                  <li>Get the calculated dimension and blade tilt angle</li>
-                  <li>All staves will be identical rectangles</li>
-                </ol>
+                <ul class="q-ma-none q-pl-md q-mb-sm">
+                  <li><strong>Chord + Sagitta:</strong> If you don't know the radius, measure the chord (straight width) and sagitta (height from chord to arc peak). The radius will be calculated automatically.</li>
+                  <li><strong>Calculate Number of Staves:</strong> Enter your desired stave width, and the tool will calculate how many staves you need.</li>
+                  <li><strong>Tapered Mode:</strong> For projects with different front and back radii (frustum shape).</li>
+                  <li><strong>Stave Thickness:</strong> Enter material thickness to get both concave (inner) and convex (outer) widths.</li>
+                </ul>
               </div>
             </q-card-section>
           </q-expansion-item>
@@ -535,11 +463,24 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Notify } from 'quasar';
 import { useCurveCoopCalculator } from '../composables/useCurveCoopCalculator';
+import { usePinchZoom } from '../composables/usePinchZoom';
 
-const { state, hasResults, hasErrors, calculate, reset } = useCurveCoopCalculator();
+const { state, hasResults, hasErrors, calculate: baseCalculate, reset } = useCurveCoopCalculator();
+
+// UI mode toggles
+const radiusSpecMode = ref<'known' | 'sagitta'>('known');
+const sagitta = ref<number | undefined>(undefined);
+const backRadiusSpecMode = ref<'known' | 'sagitta'>('known');
+const backSagitta = ref<number | undefined>(undefined);
+const calculationMode = ref<'width' | 'count'>('width');
+const desiredStaveWidth = ref<number | undefined>(undefined);
+
+// Pinch-to-zoom for visualization
+const svgRef = ref<SVGElement | null>(null);
+const { transformAttr, inverseScale } = usePinchZoom(svgRef);
 
 onMounted(() => {
   // Load angle precision preference from localStorage
@@ -551,21 +492,70 @@ onMounted(() => {
     }
   }
 
+  // Set mode to radius (arc mode)
+  state.inputs.mode = 'radius';
 });
 
-function handleModeChange(): void {
-  // Clear results when switching modes
+function handleRadiusSpecChange(): void {
+  // Clear results when switching radius specification mode
   state.outputs = null;
-  state.cylinderResults = null;
   state.isCalculated = false;
   state.errors = [];
 }
 
-function handleCylinderModeChange(): void {
-  // Clear results when switching cylinder calculation mode
-  state.cylinderResults = null;
+function handleBackRadiusSpecChange(): void {
+  // Clear results when switching back radius specification mode
+  state.outputs = null;
   state.isCalculated = false;
   state.errors = [];
+}
+
+function handleCalculationModeChange(): void {
+  // Clear results when switching calculation mode
+  state.outputs = null;
+  state.isCalculated = false;
+  state.errors = [];
+}
+
+function calculate(): void {
+  // Pre-process: Calculate front radius from chord + sagitta if needed
+  if (radiusSpecMode.value === 'sagitta' && state.inputs.totalLength && sagitta.value) {
+    // Formula: r = (s² + (c/2)²) / (2s)
+    const c = state.inputs.totalLength;
+    const s = sagitta.value;
+    const calculatedRadius = (s * s + (c / 2) * (c / 2)) / (2 * s);
+    state.inputs.radius = calculatedRadius;
+  }
+
+  // Pre-process: Calculate back radius from chord + sagitta if needed (for taper mode)
+  if (state.inputs.useTaper && backRadiusSpecMode.value === 'sagitta' && state.inputs.totalLength && backSagitta.value) {
+    // Formula: r = (s² + (c/2)²) / (2s)
+    const c = state.inputs.totalLength;
+    const s = backSagitta.value;
+    const calculatedBackRadius = (s * s + (c / 2) * (c / 2)) / (2 * s);
+    state.inputs.backRadius = calculatedBackRadius;
+  }
+
+  // Pre-process: Calculate number of staves from stave width if needed
+  if (calculationMode.value === 'count' && desiredStaveWidth.value && state.inputs.radius && state.inputs.totalLength) {
+    // Calculate central angle
+    const chord = state.inputs.totalLength;
+    const radius = state.inputs.radius;
+    const halfAngleRad = Math.asin(chord / (2 * radius));
+    const centralAngleRad = 2 * halfAngleRad;
+
+    // Calculate number of staves from desired stave width
+    // staveWidth = 2 × radius × sin(anglePerStave / 2)
+    // anglePerStave = 2 × arcsin(staveWidth / (2 × radius))
+    // numberOfStaves = centralAngle / anglePerStave
+    const staveWidth = desiredStaveWidth.value;
+    const anglePerStaveRad = 2 * Math.asin(staveWidth / (2 * radius));
+    const calculatedStaves = Math.round(centralAngleRad / anglePerStaveRad);
+    state.inputs.numberOfStaves = Math.max(2, calculatedStaves); // Minimum 2 staves
+  }
+
+  // Call the base calculate function
+  baseCalculate();
 }
 
 function handleTaperChange(): void {
@@ -677,14 +667,9 @@ function getAngleBisectors(): Array<{
 }
 
 function getDisplayHeight(): number {
-  if (state.inputs.mode === 'radius') {
-    // Calculate height from arc points
-    if (!state.outputs || state.outputs.normalizedPoints.length === 0) return 0;
-    return Math.max(...state.outputs.normalizedPoints.map(p => p.y));
-  } else {
-    // Use totalHeight for draw mode
-    return state.inputs.totalHeight || 0;
-  }
+  // Calculate height from arc points
+  if (!state.outputs || state.outputs.normalizedPoints.length === 0) return 0;
+  return Math.max(...state.outputs.normalizedPoints.map(p => p.y));
 }
 
 function getUniformScale(): number {
@@ -782,38 +767,6 @@ function copyResults(): void {
     }
   );
 }
-
-function copyCylinderResults(): void {
-  if (!state.cylinderResults) return;
-
-  let text = `Cylinder Coopering Results\n========================\n`;
-  text += `Number of Staves: ${state.cylinderResults.numberOfStaves}\n`;
-  text += `Diameter: ${state.cylinderResults.diameter}"\n`;
-  text += `Concave Width: ${state.cylinderResults.staveWidth}"\n`;
-  if (state.cylinderResults.convexWidth) {
-    text += `Convex Width: ${state.cylinderResults.convexWidth}"\n`;
-  }
-  text += `Blade Tilt: ${state.cylinderResults.bladeTiltAngle}°\n`;
-
-  navigator.clipboard.writeText(text.trim()).then(
-    () => {
-      Notify.create({
-        type: 'positive',
-        message: 'Results copied to clipboard',
-        position: 'top',
-        timeout: 2000
-      });
-    },
-    () => {
-      Notify.create({
-        type: 'negative',
-        message: 'Failed to copy results',
-        position: 'top',
-        timeout: 2000
-      });
-    }
-  );
-}
 </script>
 
 <style scoped>
@@ -832,6 +785,13 @@ function copyCylinderResults(): void {
   width: 100%;
   height: auto;
   display: block;
+  touch-action: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+.cross-section-svg g {
+  transition: transform 0.1s ease-out;
 }
 
 .angle-label-svg {
