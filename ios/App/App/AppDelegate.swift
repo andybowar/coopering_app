@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, BannerViewDelegate {
 
     var window: UIWindow?
     var bannerView: BannerView!
@@ -25,13 +25,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func addBannerView() {
         guard let window = window,
               let rootViewController = window.rootViewController else {
+            print("ERROR: Window or root view controller not available")
             return
         }
 
+        print("Creating banner view...")
+
         // Create banner view with real ad unit ID
         bannerView = BannerView(adSize: AdSizeBanner)
-        bannerView.adUnitID = "ca-app-pub-5844342294171768/3632291389"
+        bannerView.adUnitID = "ca-app-pub-5844342294171768/9281498456"
         bannerView.rootViewController = rootViewController
+        bannerView.delegate = self
 
         // Position at bottom of screen
         bannerView.translatesAutoresizingMaskIntoConstraints = false
@@ -67,9 +71,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             bridge.webView?.evaluateJavaScript(js, completionHandler: nil)
         }
 
-        // Load ad
+        // Load ad with non-personalized ads only
+        print("Loading ad request...")
         let request = Request()
+        let extras = Extras()
+        extras.additionalParameters = ["npa": "1"]  // Request non-personalized ads
+        request.register(extras)
         bannerView.load(request)
+    }
+
+    // MARK: - BannerViewDelegate
+
+    func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        print("✅ Banner ad loaded successfully!")
+    }
+
+    func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
+        print("❌ Banner ad failed to load with error: \(error.localizedDescription)")
+    }
+
+    func bannerViewWillPresentScreen(_ bannerView: BannerView) {
+        print("Banner will present screen")
+    }
+
+    func bannerViewWillDismissScreen(_ bannerView: BannerView) {
+        print("Banner will dismiss screen")
+    }
+
+    func bannerViewDidDismissScreen(_ bannerView: BannerView) {
+        print("Banner did dismiss screen")
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

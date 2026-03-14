@@ -306,8 +306,6 @@
                       :y="bisector.labelY"
                       text-anchor="middle"
                       class="angle-label-svg"
-                      :transform="`scale(${inverseScale()})`"
-                      :transform-origin="`${bisector.labelX} ${bisector.labelY}`"
                     >
                       {{ bisector.angle }}°
                     </text>

@@ -218,8 +218,6 @@
                         dominant-baseline="middle"
                         class="angle-label-svg"
                         style="font-size: 12px;"
-                        :transform="`scale(${inverseScale()})`"
-                        :transform-origin="`${getLabelX(stave.startAngle, index)} ${getLabelY(stave.startAngle, index)}`"
                       >
                         {{ stave.startBladeTilt }}°
                       </text>
@@ -245,8 +243,6 @@
                         dominant-baseline="middle"
                         class="angle-label-svg"
                         style="font-size: 12px;"
-                        :transform="`scale(${inverseScale()})`"
-                        :transform-origin="`${getLabelX(stave.endAngle, index)} ${getLabelY(stave.endAngle, index)}`"
                       >
                         {{ stave.endBladeTilt }}°
                       </text>

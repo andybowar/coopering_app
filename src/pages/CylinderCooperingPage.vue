@@ -190,8 +190,6 @@
                     dominant-baseline="middle"
                     class="angle-label-svg"
                     style="font-size: 14px;"
-                    :transform="`scale(${inverseScale()})`"
-                    transform-origin="200 140"
                   >
                     {{ state.cylinderResults.bladeTiltAngle }}°
                   </text>
