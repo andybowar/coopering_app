@@ -5,9 +5,9 @@ import type { EllipseInputs, ValidationResult } from '../types/ellipse';
  */
 export function validateEllipseInputs(inputs: EllipseInputs, calculationMode: 'width' | 'count'): ValidationResult {
   const errors: string[] = [];
-  const { length, width, numberOfStaves, staveWidth } = inputs;
+  const { length, width, numberOfStaves, staveWidth, useConical, sideBLength: backLength, sideBWidth: backWidth, depth } = inputs;
 
-  // Validate length (major axis)
+  // Validate front length (major axis)
   if (!length || length === 0) {
     errors.push('Please enter the length (major axis)');
   } else if (isNaN(length)) {
@@ -18,7 +18,7 @@ export function validateEllipseInputs(inputs: EllipseInputs, calculationMode: 'w
     errors.push('Length must be less than 10000');
   }
 
-  // Validate width (minor axis)
+  // Validate front width (minor axis)
   if (!width || width === 0) {
     errors.push('Please enter the width (minor axis)');
   } else if (isNaN(width)) {
@@ -27,6 +27,39 @@ export function validateEllipseInputs(inputs: EllipseInputs, calculationMode: 'w
     errors.push('Width must be greater than 0');
   } else if (width > 10000) {
     errors.push('Width must be less than 10000');
+  }
+
+  // Validate conical mode fields
+  if (useConical) {
+    if (!backLength || backLength === 0) {
+      errors.push('Please enter the back length');
+    } else if (isNaN(backLength)) {
+      errors.push('Back length must be a valid number');
+    } else if (backLength <= 0) {
+      errors.push('Back length must be greater than 0');
+    } else if (backLength > 10000) {
+      errors.push('Back length must be less than 10000');
+    }
+
+    if (!backWidth || backWidth === 0) {
+      errors.push('Please enter the back width');
+    } else if (isNaN(backWidth)) {
+      errors.push('Back width must be a valid number');
+    } else if (backWidth <= 0) {
+      errors.push('Back width must be greater than 0');
+    } else if (backWidth > 10000) {
+      errors.push('Back width must be less than 10000');
+    }
+
+    if (!depth || depth === 0) {
+      errors.push('Please enter the depth');
+    } else if (isNaN(depth)) {
+      errors.push('Depth must be a valid number');
+    } else if (depth <= 0) {
+      errors.push('Depth must be greater than 0');
+    } else if (depth > 10000) {
+      errors.push('Depth must be less than 10000');
+    }
   }
 
   // Validate based on calculation mode

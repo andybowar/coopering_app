@@ -220,3 +220,115 @@ export function calculateEllipseFromWidth(
   // Use the best number of staves we found
   return calculateEllipseFromStaves(length, width, bestNumberOfStaves, anglePrecision, staveThickness);
 }
+
+/**
+ * Calculate conical ellipse coopering from number of staves
+ */
+export function calculateConicalEllipseFromStaves(
+  frontLength: number,
+  frontWidth: number,
+  backLength: number,
+  backWidth: number,
+  depth: number,
+  numberOfStaves: number,
+  anglePrecision: number = 1,
+  staveThickness: number = 0
+): EllipseOutputs {
+  if (frontLength <= 0 || frontWidth <= 0 || backLength <= 0 || backWidth <= 0 || depth <= 0 || numberOfStaves < 4) {
+    throw new Error('Invalid inputs');
+  }
+
+  // Calculate front ellipse staves
+  const frontResults = calculateEllipseFromStaves(frontLength, frontWidth, numberOfStaves, anglePrecision, 0);
+  // Calculate back ellipse staves
+  const backResults = calculateEllipseFromStaves(backLength, backWidth, numberOfStaves, anglePrecision, 0);
+
+  // Merge results to create conical staves
+  const staves: EllipseStaveInfo[] = [];
+
+  for (let i = 0; i < numberOfStaves; i++) {
+    const frontStave = frontResults.staves[i];
+    const backStave = backResults.staves[i];
+
+    // Calculate taper angle (always positive, from narrow to wide)
+    const widthDiff = Math.abs(backStave.concaveWidth - frontStave.concaveWidth);
+    const taperAngleRad = Math.atan(widthDiff / (2 * depth));
+    const taperAngle = formatResult(toDegrees(taperAngleRad), anglePrecision);
+
+    const stave: EllipseStaveInfo = {
+      index: i + 1,
+      startAngle: frontStave.startAngle,
+      endAngle: frontStave.endAngle,
+      startBladeTilt: frontStave.startBladeTilt,
+      endBladeTilt: frontStave.endBladeTilt,
+      concaveWidth: frontStave.concaveWidth,
+      sideBConcaveWidth: formatResult(backStave.concaveWidth, 4),
+      length: formatResult(depth, 4),
+      taperAngle: taperAngle
+    };
+
+    // Add convex widths if thickness is specified
+    if (staveThickness > 0) {
+      // Calculate front convex width
+      const frontA = frontLength / 2;
+      const frontB = frontWidth / 2;
+      const scaleAFront = (frontA + staveThickness) / frontA;
+      const scaleBFront = (frontB + staveThickness) / frontB;
+      const outerAFront = frontA * scaleAFront;
+      const outerBFront = frontB * scaleBFront;
+
+      const t1 = toRadians(frontStave.startAngle);
+      const t2 = toRadians(frontStave.endAngle);
+      const outerP1Front = getEllipsePoint(outerAFront, outerBFront, t1);
+      const outerP2Front = getEllipsePoint(outerAFront, outerBFront, t2);
+      stave.convexWidth = formatResult(distance(outerP1Front.x, outerP1Front.y, outerP2Front.x, outerP2Front.y), 4);
+
+      // Calculate back convex width
+      const backA = backLength / 2;
+      const backB = backWidth / 2;
+      const scaleABack = (backA + staveThickness) / backA;
+      const scaleBBack = (backB + staveThickness) / backB;
+      const outerABack = backA * scaleABack;
+      const outerBBack = backB * scaleBBack;
+
+      const outerP1Back = getEllipsePoint(outerABack, outerBBack, t1);
+      const outerP2Back = getEllipsePoint(outerABack, outerBBack, t2);
+      stave.sideBConvexWidth = formatResult(distance(outerP1Back.x, outerP1Back.y, outerP2Back.x, outerP2Back.y), 4);
+    }
+
+    staves.push(stave);
+  }
+
+  return {
+    staves,
+    totalStaves: numberOfStaves
+  };
+}
+
+/**
+ * Calculate conical ellipse coopering from desired stave width
+ */
+export function calculateConicalEllipseFromWidth(
+  frontLength: number,
+  frontWidth: number,
+  backLength: number,
+  backWidth: number,
+  depth: number,
+  desiredStaveWidth: number,
+  anglePrecision: number = 1,
+  staveThickness: number = 0
+): EllipseOutputs {
+  // Use the average of front and back ellipses to determine stave count
+  const avgLength = (frontLength + backLength) / 2;
+  const avgWidth = (frontWidth + backWidth) / 2;
+
+  // Find best number of staves using average dimensions
+  const tempResults = calculateEllipseFromWidth(avgLength, avgWidth, desiredStaveWidth, anglePrecision, 0);
+  const numberOfStaves = tempResults.totalStaves;
+
+  // Calculate conical with that number of staves
+  return calculateConicalEllipseFromStaves(
+    frontLength, frontWidth, backLength, backWidth, depth,
+    numberOfStaves, anglePrecision, staveThickness
+  );
+}

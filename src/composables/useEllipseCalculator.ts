@@ -1,6 +1,11 @@
 import { reactive, computed } from 'vue';
 import type { EllipseInputs, EllipseOutputs } from '../types/ellipse';
-import { calculateEllipseFromStaves, calculateEllipseFromWidth } from '../utils/ellipseFormulas';
+import {
+  calculateEllipseFromStaves,
+  calculateEllipseFromWidth,
+  calculateConicalEllipseFromStaves,
+  calculateConicalEllipseFromWidth
+} from '../utils/ellipseFormulas';
 import { validateEllipseInputs } from '../utils/ellipseValidation';
 
 interface EllipseState {
@@ -21,7 +26,11 @@ export function useEllipseCalculator() {
       width: undefined as any,
       numberOfStaves: undefined,
       staveWidth: undefined,
-      staveThickness: undefined
+      staveThickness: undefined,
+      useConical: false,
+      sideBLength: undefined,
+      sideBWidth: undefined,
+      depth: undefined
     },
     outputs: null,
     isCalculated: false,
@@ -57,24 +66,50 @@ export function useEllipseCalculator() {
     state.errors = [];
 
     try {
-      if (calculationMode === 'width') {
-        // Calculate stave widths from number of staves
-        state.outputs = calculateEllipseFromStaves(
-          state.inputs.length,
-          state.inputs.width,
-          state.inputs.numberOfStaves!,
-          state.anglePrecision,
-          state.inputs.staveThickness || 0
-        );
+      if (state.inputs.useConical) {
+        // Conical ellipse calculations
+        if (calculationMode === 'width') {
+          state.outputs = calculateConicalEllipseFromStaves(
+            state.inputs.length,
+            state.inputs.width,
+            state.inputs.sideBLength!,
+            state.inputs.sideBWidth!,
+            state.inputs.depth!,
+            state.inputs.numberOfStaves!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+        } else {
+          state.outputs = calculateConicalEllipseFromWidth(
+            state.inputs.length,
+            state.inputs.width,
+            state.inputs.sideBLength!,
+            state.inputs.sideBWidth!,
+            state.inputs.depth!,
+            state.inputs.staveWidth!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+        }
       } else {
-        // Calculate number of staves from desired stave width
-        state.outputs = calculateEllipseFromWidth(
-          state.inputs.length,
-          state.inputs.width,
-          state.inputs.staveWidth!,
-          state.anglePrecision,
-          state.inputs.staveThickness || 0
-        );
+        // Regular ellipse calculations
+        if (calculationMode === 'width') {
+          state.outputs = calculateEllipseFromStaves(
+            state.inputs.length,
+            state.inputs.width,
+            state.inputs.numberOfStaves!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+        } else {
+          state.outputs = calculateEllipseFromWidth(
+            state.inputs.length,
+            state.inputs.width,
+            state.inputs.staveWidth!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+        }
       }
       state.isCalculated = true;
     } catch (error) {
@@ -93,7 +128,11 @@ export function useEllipseCalculator() {
       width: undefined as any,
       numberOfStaves: undefined,
       staveWidth: undefined,
-      staveThickness: undefined
+      staveThickness: undefined,
+      useConical: false,
+      sideBLength: undefined,
+      sideBWidth: undefined,
+      depth: undefined
     };
     state.outputs = null;
     state.isCalculated = false;

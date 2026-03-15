@@ -46,6 +46,7 @@ export interface CurveCoopOutputs {
   totalAngleChange: number;  // Total curve deviation
   averageStaveWidth: number;
   normalizedPoints: Point[];  // Points for visualization
+  backNormalizedPoints?: Point[];  // Back curve points for tapered visualization
 }
 
 /**

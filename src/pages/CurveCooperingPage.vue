@@ -263,7 +263,18 @@
               </div>
               <svg ref="svgRef" viewBox="0 0 400 280" class="cross-section-svg">
                 <g :transform="transformAttr(200, 140)">
-                  <!-- Draw the curve (no additional smoothing, just the normalized points) -->
+                  <!-- Draw the back curve (green dashed, for tapered mode) -->
+                  <path
+                    v-if="state.inputs.useTaper && state.outputs?.backNormalizedPoints"
+                    :d="getBackCurvePath()"
+                    fill="none"
+                    stroke="#66bb6a"
+                    stroke-width="2"
+                    stroke-dasharray="6,4"
+                    opacity="0.7"
+                  />
+
+                  <!-- Draw the front curve -->
                   <path
                     :d="getCurvePath()"
                     fill="none"
@@ -306,6 +317,7 @@
                       :y="bisector.labelY"
                       text-anchor="middle"
                       class="angle-label-svg"
+                      :font-size="labelFontSize"
                     >
                       {{ bisector.angle }}°
                     </text>
@@ -313,7 +325,12 @@
                 </g>
               </svg>
               <div class="text-caption text-grey-7 text-center q-mt-xs">
-                Blue: coopering shape | Light blue: staves | Orange: angle bisectors with blade tilt
+                <span v-if="state.inputs.useTaper">
+                  Blue (solid): Front curve | Green (dashed): Back curve | Light blue: staves | Orange: blade tilt angles
+                </span>
+                <span v-else>
+                  Blue: coopering shape | Light blue: staves | Orange: angle bisectors with blade tilt
+                </span>
               </div>
             </div>
 
@@ -461,7 +478,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Notify } from 'quasar';
 import { useCurveCoopCalculator } from '../composables/useCurveCoopCalculator';
 import { usePinchZoom } from '../composables/usePinchZoom';
@@ -478,7 +495,19 @@ const desiredStaveWidth = ref<number | undefined>(undefined);
 
 // Pinch-to-zoom for visualization
 const svgRef = ref<SVGElement | null>(null);
-const { transformAttr, inverseScale } = usePinchZoom(svgRef);
+const { transformAttr, inverseScale, scale } = usePinchZoom(svgRef);
+
+// Computed font size that scales with zoom
+const labelFontSize = computed(() => {
+  const size = 14 * scale.value;
+  console.log('Curve label font size:', size, 'scale:', scale.value);
+  return size;
+});
+
+// Debug scale changes
+watch(scale, (newVal) => {
+  console.log('Curve scale changed:', newVal);
+});
 
 onMounted(() => {
   // Load angle precision preference from localStorage
@@ -583,6 +612,23 @@ function getCurvePath(): string {
   let path = `M ${getScaledX(points[0].x)} ${getScaledY(points[0].y)}`;
 
   // Draw straight lines between normalized points (no additional smoothing)
+  for (let i = 1; i < points.length; i++) {
+    path += ` L ${getScaledX(points[i].x)} ${getScaledY(points[i].y)}`;
+  }
+
+  return path;
+}
+
+function getBackCurvePath(): string {
+  if (!state.outputs || !state.outputs.backNormalizedPoints || state.outputs.backNormalizedPoints.length === 0) return '';
+
+  const points = state.outputs.backNormalizedPoints;
+  if (points.length < 2) return '';
+
+  // Start the path
+  let path = `M ${getScaledX(points[0].x)} ${getScaledY(points[0].y)}`;
+
+  // Draw straight lines between normalized points
   for (let i = 1; i < points.length; i++) {
     path += ` L ${getScaledX(points[i].x)} ${getScaledY(points[i].y)}`;
   }
@@ -793,7 +839,6 @@ function copyResults(): void {
 }
 
 .angle-label-svg {
-  font-size: 10px;
   font-weight: 600;
   fill: #f57c00;
 }

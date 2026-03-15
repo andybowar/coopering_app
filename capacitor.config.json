@@ -1,7 +1,7 @@
 {
   "appId": "com.bowardevelopment.cooperingcalculator",
   "appName": "Coopering Calculator",
-  "webDir": "dist/pwa",
+  "webDir": "dist/spa",
   "server": {
     "androidScheme": "https"
   },

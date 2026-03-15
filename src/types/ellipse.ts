@@ -7,6 +7,10 @@ export interface EllipseInputs {
   numberOfStaves?: number;  // Number of staves in one quarter
   staveWidth?: number;  // Desired average stave width (alternative to numberOfStaves)
   staveThickness?: number;  // Thickness of stave material in inches
+  useConical: boolean;  // Whether to use conical mode with different top/bottom ellipses
+  sideBLength?: number;  // Side B major axis (only when useConical is true)
+  sideBWidth?: number;  // Side B minor axis (only when useConical is true)
+  depth?: number;  // Height/depth from side A to side B in inches (only when useConical is true)
 }
 
 /**
@@ -18,8 +22,12 @@ export interface EllipseStaveInfo {
   endAngle: number;  // End angle in degrees
   startBladeTilt: number;  // Blade tilt angle at start of stave
   endBladeTilt: number;  // Blade tilt angle at end of stave
-  concaveWidth: number;  // Chord length (concave/inner width)
-  convexWidth?: number;  // Chord length on outer surface (when thickness specified)
+  concaveWidth: number;  // Chord length (concave/inner width) at front
+  convexWidth?: number;  // Chord length on outer surface (when thickness specified) at front
+  sideBConcaveWidth?: number;  // Side B concave width for conical staves
+  sideBConvexWidth?: number;  // Side B convex width for conical staves
+  length?: number;  // Stave length (depth) for conical staves
+  taperAngle?: number;  // Taper angle from perpendicular (for conical staves)
 }
 
 /**

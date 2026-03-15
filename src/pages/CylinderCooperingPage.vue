@@ -189,7 +189,7 @@
                     text-anchor="middle"
                     dominant-baseline="middle"
                     class="angle-label-svg"
-                    style="font-size: 14px;"
+                    :font-size="labelFontSize"
                   >
                     {{ state.cylinderResults.bladeTiltAngle }}°
                   </text>
@@ -293,7 +293,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Notify } from 'quasar';
 import { useCurveCoopCalculator } from '../composables/useCurveCoopCalculator';
 import { usePinchZoom } from '../composables/usePinchZoom';
@@ -302,7 +302,19 @@ const { state, hasResults, hasErrors, calculate, reset } = useCurveCoopCalculato
 
 // Pinch-to-zoom for visualization
 const svgRef = ref<SVGElement | null>(null);
-const { transformAttr, inverseScale } = usePinchZoom(svgRef);
+const { transformAttr, inverseScale, scale } = usePinchZoom(svgRef);
+
+// Computed font size that scales with zoom
+const labelFontSize = computed(() => {
+  const size = 16 * scale.value;
+  console.log('Cylinder label font size:', size, 'scale:', scale.value);
+  return size;
+});
+
+// Debug scale changes
+watch(scale, (newVal) => {
+  console.log('Cylinder scale changed:', newVal);
+});
 
 onMounted(() => {
   // Set mode to cylinder on mount
@@ -394,7 +406,6 @@ function copyCylinderResults(): void {
 }
 
 .angle-label-svg {
-  font-size: 10px;
   font-weight: 600;
   fill: #f57c00;
 }

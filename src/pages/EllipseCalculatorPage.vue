@@ -69,6 +69,56 @@
                 :rules="[val => val > 0 || 'Must be > 0']"
               />
 
+              <!-- Conical option -->
+              <div class="q-mb-sm">
+                <q-checkbox
+                  v-model="state.inputs.useConical"
+                  label="Conical Ellipse"
+                  dense
+                  @update:model-value="handleConicalChange"
+                />
+              </div>
+
+              <!-- Side B Ellipse Dimensions (only for conical mode) -->
+              <q-input
+                v-if="state.inputs.useConical"
+                v-model.number="state.inputs.sideBLength"
+                type="number"
+                step="0.1"
+                dense
+                outlined
+                label="Side B Length (Major Axis)"
+                suffix="in"
+                class="q-mb-sm"
+                :rules="[val => val > 0 || 'Must be > 0']"
+              />
+
+              <q-input
+                v-if="state.inputs.useConical"
+                v-model.number="state.inputs.sideBWidth"
+                type="number"
+                step="0.1"
+                dense
+                outlined
+                label="Side B Width (Minor Axis)"
+                suffix="in"
+                class="q-mb-sm"
+                :rules="[val => val > 0 || 'Must be > 0']"
+              />
+
+              <q-input
+                v-if="state.inputs.useConical"
+                v-model.number="state.inputs.depth"
+                type="number"
+                step="0.1"
+                dense
+                outlined
+                label="Depth (Side A to Side B)"
+                suffix="in"
+                class="q-mb-sm"
+                :rules="[val => val > 0 || 'Must be > 0']"
+              />
+
               <!-- Calculation Mode Toggle -->
               <div class="q-mb-sm">
                 <div class="text-caption text-grey-7 q-mb-xs">I know the:</div>
@@ -177,7 +227,18 @@
               </div>
               <svg ref="svgRef" viewBox="-10 -10 420 320" class="ellipse-svg">
                 <g :transform="transformAttr(200, 145)">
-                  <!-- Draw the ellipse outline (quarter) -->
+                  <!-- Draw the Side B ellipse (green dashed, background) -->
+                  <path
+                    v-if="state.inputs.useConical"
+                    :d="getBackEllipsePath()"
+                    fill="none"
+                    stroke="#66bb6a"
+                    stroke-width="2"
+                    stroke-dasharray="6,4"
+                    opacity="0.7"
+                  />
+
+                  <!-- Draw the Side A ellipse (blue solid) -->
                   <path
                     :d="getEllipsePath()"
                     fill="none"
@@ -217,7 +278,7 @@
                         text-anchor="middle"
                         dominant-baseline="middle"
                         class="angle-label-svg"
-                        style="font-size: 12px;"
+                        :font-size="labelFontSize"
                       >
                         {{ stave.startBladeTilt }}°
                       </text>
@@ -242,7 +303,7 @@
                         text-anchor="middle"
                         dominant-baseline="middle"
                         class="angle-label-svg"
-                        style="font-size: 12px;"
+                        :font-size="labelFontSize"
                       >
                         {{ stave.endBladeTilt }}°
                       </text>
@@ -251,7 +312,12 @@
                 </g>
               </svg>
               <div class="text-caption text-grey-7 text-center q-mt-xs">
-                Blue: ellipse outline | Light blue: staves | Orange: blade tilt angles at joints
+                <span v-if="state.inputs.useConical">
+                  Blue (solid): Side A ellipse | Green (dashed): Side B ellipse | Light blue: staves | Orange: blade tilt angles
+                </span>
+                <span v-else>
+                  Blue: ellipse outline | Light blue: staves | Orange: blade tilt angles at joints
+                </span>
               </div>
             </div>
 
@@ -339,7 +405,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { Notify } from 'quasar';
 import { useEllipseCalculator } from '../composables/useEllipseCalculator';
 import { usePinchZoom } from '../composables/usePinchZoom';
@@ -351,7 +417,19 @@ const calculationMode = ref<'width' | 'count'>('width');
 
 // Pinch-to-zoom for visualization
 const svgRef = ref<SVGElement | null>(null);
-const { transformAttr, inverseScale, resetZoom } = usePinchZoom(svgRef);
+const { transformAttr, inverseScale, resetZoom, scale } = usePinchZoom(svgRef);
+
+// Computed font size that scales with zoom
+const labelFontSize = computed(() => {
+  const size = 14 * scale.value;
+  console.log('Ellipse label font size:', size, 'scale:', scale.value);
+  return size;
+});
+
+// Debug scale changes
+watch(scale, (newVal) => {
+  console.log('Ellipse scale changed:', newVal);
+});
 
 // Table columns configuration
 const tableColumns = computed<QTableColumn[]>(() => {
@@ -378,27 +456,84 @@ const tableColumns = computed<QTableColumn[]>(() => {
       align: 'center',
       sortable: false,
       format: (val: number) => `${val}°`
-    },
-    {
+    }
+  ];
+
+  // Add conical columns if in conical mode
+  if (state.inputs.useConical && state.outputs?.staves[0]?.sideBConcaveWidth !== undefined) {
+    columns.push({
+      name: 'concaveWidth',
+      label: 'Side A Concave',
+      field: 'concaveWidth',
+      align: 'center',
+      sortable: false,
+      format: (val: number) => `${val}"`
+    });
+    columns.push({
+      name: 'sideBConcaveWidth',
+      label: 'Side B Concave',
+      field: 'sideBConcaveWidth',
+      align: 'center',
+      sortable: false,
+      format: (val: number) => `${val}"`
+    });
+    columns.push({
+      name: 'length',
+      label: 'Length',
+      field: 'length',
+      align: 'center',
+      sortable: false,
+      format: (val: number) => `${val}"`
+    });
+    columns.push({
+      name: 'taperAngle',
+      label: 'Taper',
+      field: 'taperAngle',
+      align: 'center',
+      sortable: false,
+      format: (val: number) => `${val}°`
+    });
+  } else {
+    // Regular ellipse columns
+    columns.push({
       name: 'concaveWidth',
       label: 'Concave Width',
       field: 'concaveWidth',
       align: 'center',
       sortable: false,
       format: (val: number) => `${val}"`
-    }
-  ];
-
-  // Add convex width column if thickness is specified
-  if (state.inputs.staveThickness && state.outputs?.staves[0]?.convexWidth !== undefined) {
-    columns.push({
-      name: 'convexWidth',
-      label: 'Convex Width',
-      field: 'convexWidth',
-      align: 'center',
-      sortable: false,
-      format: (val: number) => `${val}"`
     });
+  }
+
+  // Add convex width columns if thickness is specified
+  if (state.inputs.staveThickness && state.outputs?.staves[0]?.convexWidth !== undefined) {
+    if (state.inputs.useConical && state.outputs?.staves[0]?.sideBConvexWidth !== undefined) {
+      columns.push({
+        name: 'convexWidth',
+        label: 'Side A Convex',
+        field: 'convexWidth',
+        align: 'center',
+        sortable: false,
+        format: (val: number) => `${val}"`
+      });
+      columns.push({
+        name: 'sideBConvexWidth',
+        label: 'Side B Convex',
+        field: 'sideBConvexWidth',
+        align: 'center',
+        sortable: false,
+        format: (val: number) => `${val}"`
+      });
+    } else {
+      columns.push({
+        name: 'convexWidth',
+        label: 'Convex Width',
+        field: 'convexWidth',
+        align: 'center',
+        sortable: false,
+        format: (val: number) => `${val}"`
+      });
+    }
   }
 
   return columns;
@@ -432,6 +567,13 @@ function handleCalculationModeChange(): void {
   state.errors = [];
 }
 
+function handleConicalChange(): void {
+  // Clear results when toggling conical mode
+  state.outputs = null;
+  state.isCalculated = false;
+  state.errors = [];
+}
+
 function calculate(): void {
   baseCalculate(calculationMode.value);
 }
@@ -440,17 +582,32 @@ function copyResults(): void {
   if (!state.outputs) return;
 
   let text = `Ellipse Coopering Results\n========================\n`;
-  text += `Length (Major Axis): ${state.inputs.length}"\n`;
-  text += `Width (Minor Axis): ${state.inputs.width}"\n`;
+  text += `Side A Length (Major Axis): ${state.inputs.length}"\n`;
+  text += `Side A Width (Minor Axis): ${state.inputs.width}"\n`;
+
+  if (state.inputs.useConical) {
+    text += `Side B Length (Major Axis): ${state.inputs.sideBLength}"\n`;
+    text += `Side B Width (Minor Axis): ${state.inputs.sideBWidth}"\n`;
+    text += `Depth: ${state.inputs.depth}"\n`;
+  }
+
   text += `Total Staves: ${state.outputs.totalStaves}\n`;
   if (state.inputs.staveThickness) {
     text += `Stave Thickness: ${state.inputs.staveThickness}"\n`;
   }
   text += `\nStave Details:\n`;
-  text += `${'Stave #'.padEnd(10)}${'Start°'.padEnd(10)}${'End°'.padEnd(10)}${'Concave"'.padEnd(12)}`;
+  text += `${'Stave #'.padEnd(10)}${'Start°'.padEnd(10)}${'End°'.padEnd(10)}`;
 
-  if (state.outputs.staves[0]?.convexWidth !== undefined) {
-    text += `${'Convex"'.padEnd(12)}`;
+  if (state.inputs.useConical && state.outputs.staves[0]?.sideBConcaveWidth !== undefined) {
+    text += `${'F.Concave"'.padEnd(12)}${'B.Concave"'.padEnd(12)}${'Length"'.padEnd(10)}${'Taper°'.padEnd(10)}`;
+    if (state.outputs.staves[0]?.convexWidth !== undefined) {
+      text += `${'F.Convex"'.padEnd(12)}${'B.Convex"'.padEnd(12)}`;
+    }
+  } else {
+    text += `${'Concave"'.padEnd(12)}`;
+    if (state.outputs.staves[0]?.convexWidth !== undefined) {
+      text += `${'Convex"'.padEnd(12)}`;
+    }
   }
   text += `\n`;
 
@@ -458,9 +615,21 @@ function copyResults(): void {
     text += `${String(stave.index).padEnd(10)}`;
     text += `${String(stave.startBladeTilt).padEnd(10)}`;
     text += `${String(stave.endBladeTilt).padEnd(10)}`;
-    text += `${String(stave.concaveWidth).padEnd(12)}`;
-    if (stave.convexWidth !== undefined) {
-      text += `${String(stave.convexWidth).padEnd(12)}`;
+
+    if (state.inputs.useConical && stave.sideBConcaveWidth !== undefined) {
+      text += `${String(stave.concaveWidth).padEnd(12)}`;
+      text += `${String(stave.sideBConcaveWidth).padEnd(12)}`;
+      text += `${String(stave.length).padEnd(10)}`;
+      text += `${String(stave.taperAngle).padEnd(10)}`;
+      if (stave.convexWidth !== undefined) {
+        text += `${String(stave.convexWidth).padEnd(12)}`;
+        text += `${String(stave.sideBConvexWidth).padEnd(12)}`;
+      }
+    } else {
+      text += `${String(stave.concaveWidth).padEnd(12)}`;
+      if (stave.convexWidth !== undefined) {
+        text += `${String(stave.convexWidth).padEnd(12)}`;
+      }
     }
     text += `\n`;
   });
@@ -503,6 +672,30 @@ function getEllipsePath(): string {
   let path = '';
   for (let i = 0; i <= steps; i++) {
     const t = (i / steps) * (2 * Math.PI); // 0 to 360 degrees in radians
+    const x = centerX + a * Math.cos(t);
+    const y = centerY - b * Math.sin(t);
+    path += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
+  }
+  return path;
+}
+
+function getBackEllipsePath(): string {
+  if (!state.outputs || !state.inputs.useConical) return '';
+
+  const centerX = 200;
+  const centerY = 145;
+  const scaleX = 340 / state.inputs.length;
+  const scaleY = 240 / state.inputs.width;
+  const scale = Math.min(scaleX, scaleY);
+
+  const a = (state.inputs.sideBLength! / 2) * scale;
+  const b = (state.inputs.sideBWidth! / 2) * scale;
+
+  // Create path for full back ellipse (0° to 360°)
+  const steps = 100;
+  let path = '';
+  for (let i = 0; i <= steps; i++) {
+    const t = (i / steps) * (2 * Math.PI);
     const x = centerX + a * Math.cos(t);
     const y = centerY - b * Math.sin(t);
     path += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
@@ -628,6 +821,5 @@ function getLabelY(angleDegrees: number, index: number): number {
 .angle-label-svg {
   fill: #f57c00;
   font-weight: 600;
-  font-size: 12px;
 }
 </style>

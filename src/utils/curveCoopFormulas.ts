@@ -423,7 +423,8 @@ export function calculateTaperedCoop(
     staves,
     totalAngleChange: formatResult(totalAngleChange),
     averageStaveWidth: formatResult(averageStaveWidth, 4),
-    normalizedPoints: frontPoints
+    normalizedPoints: frontPoints,
+    backNormalizedPoints: backPoints
   };
 }
 
