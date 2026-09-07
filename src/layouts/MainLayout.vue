@@ -138,6 +138,25 @@
 
           <q-item
             clickable
+            :active="route.path === '/arc-radius'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/arc-radius')"
+          >
+            <q-item-section avatar>
+              <q-icon>
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path d="M4 18 Q 12 6, 20 18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="12" y1="18" x2="12" y2="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2,2" opacity="0.7"/>
+                </svg>
+              </q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Arc Radius</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
             :active="route.path === '/saved-calculations'"
             active-class="bg-primary text-white"
             @click="navigateTo('/saved-calculations')"
@@ -229,7 +248,7 @@ const drawerOpen = ref(false);
 
 // Check if current route is under calculator section
 const isCalculatorRoute = computed(() => {
-  return route.path === '/pyramid' || route.path === '/box' || route.path === '/curve' || route.path === '/cylinder' || route.path === '/ellipse' || route.path === '/saved-calculations';
+  return route.path === '/pyramid' || route.path === '/box' || route.path === '/curve' || route.path === '/cylinder' || route.path === '/ellipse' || route.path === '/arc-radius' || route.path === '/saved-calculations';
 });
 
 // Check if current route is under trigonometry section

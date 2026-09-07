@@ -98,37 +98,23 @@
 
                 <!-- Angle A input (bottom-left) -->
                 <div class="input-angle-a">
-                  <q-input
-                    v-model.number="state.inputs.angleA"
-                    type="number"
-                    step="0.1"
-                    dense
-                    outlined
+                  <AngleInput
+                    :model-value="hasResults && state.outputs ? state.outputs.angleA : state.inputs.angleA"
                     placeholder="∠A"
-                    suffix="°"
                     :readonly="hasResults"
                     :filled="hasResults && state.outputs"
-                    :model-value="hasResults && state.outputs ? state.outputs.angleA : state.inputs.angleA"
                     @update:model-value="!hasResults && updateInput('angleA', $event)"
-                    class="compact-input"
                   />
                 </div>
 
                 <!-- Angle B input (top-right) -->
                 <div class="input-angle-b">
-                  <q-input
-                    v-model.number="state.inputs.angleB"
-                    type="number"
-                    step="0.1"
-                    dense
-                    outlined
+                  <AngleInput
+                    :model-value="hasResults && state.outputs ? state.outputs.angleB : state.inputs.angleB"
                     placeholder="∠B"
-                    suffix="°"
                     :readonly="hasResults"
                     :filled="hasResults && state.outputs"
-                    :model-value="hasResults && state.outputs ? state.outputs.angleB : state.inputs.angleB"
                     @update:model-value="!hasResults && updateInput('angleB', $event)"
-                    class="compact-input"
                   />
                 </div>
               </div>
@@ -208,6 +194,7 @@
 <script setup lang="ts">
 import { Notify } from 'quasar';
 import { useTrigCalculator } from '../composables/useTrigCalculator';
+import AngleInput from '../components/AngleInput.vue';
 
 // Use the calculator composable
 const { state, hasResults, hasErrors, calculate, reset, updateInput } = useTrigCalculator();

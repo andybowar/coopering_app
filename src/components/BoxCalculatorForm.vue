@@ -16,17 +16,14 @@
           class="q-mb-sm"
         />
 
-        <q-input
-          v-model.number="localInputs.sideAngle"
-          type="number"
-          step="0.1"
-          dense
-          outlined
-          label="Side Angle"
-          suffix="°"
-          :rules="[val => val > 0 && val < 90 || 'Must be 0 < angle < 90']"
-          class="q-mb-sm"
-        />
+        <div class="q-mb-sm">
+          <div class="text-caption q-mb-xs">Side Angle</div>
+          <AngleInput
+            v-model="localInputs.sideAngle"
+            :validation="(val: number) => (val > 0 && val < 90) || 'Must be 0 < angle < 90'"
+            :angle-reference="localInputs.fromVertical ? 'vertical' : 'horizontal'"
+          />
+        </div>
 
         <div class="q-mb-sm">
           <div class="text-caption q-mb-xs">Angle From</div>
@@ -69,6 +66,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
 import type { BoxInputs } from '../types/box';
+import AngleInput from './AngleInput.vue';
 
 interface Props {
   modelValue: BoxInputs;

@@ -79,6 +79,24 @@
             </q-card-section>
           </q-card>
         </div>
+
+        <!-- Arc Radius Calculator -->
+        <div class="col-6">
+          <q-card flat bordered class="feature-card cursor-pointer" @click="navigateTo('/arc-radius')">
+            <q-card-section class="text-center q-pa-sm">
+              <q-icon size="48px" color="primary" class="q-mb-xs">
+                <svg viewBox="0 0 24 24" width="48" height="48">
+                  <path d="M4 18 Q 12 6, 20 18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="12" y1="18" x2="12" y2="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2,2" opacity="0.7"/>
+                </svg>
+              </q-icon>
+              <div class="text-subtitle2 text-weight-medium q-mb-xs">Arc Radius</div>
+              <div class="text-caption text-grey-7">
+                Calculate radius from sagitta and chord
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
     </div>
   </q-page>

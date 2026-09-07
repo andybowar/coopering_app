@@ -5,6 +5,7 @@ import IndexPage from '../pages/IndexPage.vue';
 import BoxCalculatorPage from '../pages/BoxCalculatorPage.vue';
 import TrigCalculatorPage from '../pages/TrigCalculatorPage.vue';
 import GeneralTriangleCalculatorPage from '../pages/GeneralTriangleCalculatorPage.vue';
+import ArcRadiusCalculatorPage from '../pages/ArcRadiusCalculatorPage.vue';
 import CurveCooperingPage from '../pages/CurveCooperingPage.vue';
 import CylinderCooperingPage from '../pages/CylinderCooperingPage.vue';
 import EllipseCalculatorPage from '../pages/EllipseCalculatorPage.vue';
@@ -24,6 +25,7 @@ const routes = [
       { path: 'ellipse', component: EllipseCalculatorPage },
       { path: 'trig-right', component: TrigCalculatorPage },
       { path: 'trig-general', component: GeneralTriangleCalculatorPage },
+      { path: 'arc-radius', component: ArcRadiusCalculatorPage },
       { path: 'reference', component: ReferenceChartsPage },
       { path: 'saved-calculations', component: SavedCalculationsPage }
     ]
