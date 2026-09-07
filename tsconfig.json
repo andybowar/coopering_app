@@ -1,6 +1,16 @@
 {
-  "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
@@ -12,5 +22,7 @@
       "boot/*": ["src/boot/*"],
       "stores/*": ["src/stores/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "exclude": ["node_modules"]
 }

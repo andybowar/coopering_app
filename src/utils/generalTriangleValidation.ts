@@ -77,8 +77,16 @@ export function validateGeneralTriangleInputs(inputs: GeneralTriangleInputs): Va
   const angles = [angleA, angleB, angleC].filter(a => a !== undefined && a !== null && a > 0);
   if (angles.length >= 2) {
     const angleSum = angles.reduce((sum, angle) => sum + angle, 0);
-    if (angleSum >= 180) {
-      errors.push('Sum of angles must be less than 180°');
+    if (angles.length === 3) {
+      // All three angles: sum must equal 180° (with small tolerance for rounding)
+      if (Math.abs(angleSum - 180) > 0.01) {
+        errors.push('Sum of all three angles must equal 180°');
+      }
+    } else {
+      // Two angles: sum must be less than 180°
+      if (angleSum >= 180) {
+        errors.push('Sum of angles must be less than 180°');
+      }
     }
   }
 

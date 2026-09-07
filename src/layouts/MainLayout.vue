@@ -41,26 +41,27 @@
       <q-separator dark />
 
       <q-list dark>
+        <!-- Home -->
+        <q-item
+          clickable
+          :active="route.path === '/'"
+          active-class="bg-primary text-white"
+          @click="navigateTo('/')"
+        >
+          <q-item-section avatar>
+            <q-icon name="home" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Home</q-item-label>
+          </q-item-section>
+        </q-item>
+
         <q-expansion-item
           expand-separator
           icon="calculate"
           label="Calculators"
           :default-opened="isCalculatorRoute"
         >
-          <q-item
-            clickable
-            :active="route.path === '/'"
-            active-class="bg-primary text-white"
-            @click="navigateTo('/')"
-          >
-            <q-item-section avatar>
-              <trapezoid-icon />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Box</q-item-label>
-            </q-item-section>
-          </q-item>
-
           <q-item
             clickable
             :active="route.path === '/pyramid'"
@@ -72,6 +73,85 @@
             </q-item-section>
             <q-item-section>
               <q-item-label>Pyramid</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/box'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/box')"
+          >
+            <q-item-section avatar>
+              <trapezoid-icon />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Box</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/curve'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/curve')"
+          >
+            <q-item-section avatar>
+              <q-icon>
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path d="M4 6 Q 12 18, 20 6" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Curve Coopering</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/cylinder'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/cylinder')"
+          >
+            <q-item-section avatar>
+              <q-icon name="fiber_manual_record" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Cylinder</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/ellipse'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/ellipse')"
+          >
+            <q-item-section avatar>
+              <q-icon name="panorama_fish_eye" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Ellipse</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            :active="route.path === '/arc-radius'"
+            active-class="bg-primary text-white"
+            @click="navigateTo('/arc-radius')"
+          >
+            <q-item-section avatar>
+              <q-icon>
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path d="M4 18 Q 12 6, 20 18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="12" y1="18" x2="12" y2="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2,2" opacity="0.7"/>
+                </svg>
+              </q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Arc Radius</q-item-label>
             </q-item-section>
           </q-item>
 
@@ -168,7 +248,7 @@ const drawerOpen = ref(false);
 
 // Check if current route is under calculator section
 const isCalculatorRoute = computed(() => {
-  return route.path === '/' || route.path === '/pyramid' || route.path === '/saved-calculations';
+  return route.path === '/pyramid' || route.path === '/box' || route.path === '/curve' || route.path === '/cylinder' || route.path === '/ellipse' || route.path === '/arc-radius' || route.path === '/saved-calculations';
 });
 
 // Check if current route is under trigonometry section
@@ -204,6 +284,8 @@ function navigateTo(path: string): void {
 /* Drawer toolbar styling */
 .drawer-toolbar {
   min-height: 56px !important;
+  /* Add safe area padding for notch/Dynamic Island */
+  padding-top: max(env(safe-area-inset-top), 60px) !important;
 }
 
 /* Add safe area padding to page content */
