@@ -4,7 +4,10 @@ import {
   calculateEllipseFromStaves,
   calculateEllipseFromWidth,
   calculateConicalEllipseFromStaves,
-  calculateConicalEllipseFromWidth
+  calculateConicalEllipseFromWidth,
+  calculateCircleFromDiameter,
+  calculateCircleFromStaveWidth,
+  calculateConicalCircleFromDiameters
 } from '../utils/ellipseFormulas';
 import { validateEllipseInputs } from '../utils/ellipseValidation';
 
@@ -22,8 +25,13 @@ interface EllipseState {
 export function useEllipseCalculator() {
   const state = reactive<EllipseState>({
     inputs: {
+      shape: 'ellipse',
       length: undefined as any,
       width: undefined as any,
+      diameter: undefined,
+      sideBDiameter: undefined,
+      circleCalcMode: 'fromDiameter',
+      taperResultMode: 'angle',
       numberOfStaves: undefined,
       staveWidth: undefined,
       staveThickness: undefined,
@@ -66,6 +74,50 @@ export function useEllipseCalculator() {
     state.errors = [];
 
     try {
+      if (state.inputs.shape === 'circle') {
+        // Circle mode: one diameter, identical staves.
+        if (state.inputs.useConical) {
+          // Cone / truncated cone: two end diameters plus the depth between.
+          state.outputs = calculateConicalCircleFromDiameters(
+            state.inputs.diameter!,
+            state.inputs.sideBDiameter!,
+            state.inputs.depth!,
+            state.inputs.numberOfStaves!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+          // Mirror both diameters into the axis fields the visualization reads.
+          state.inputs.length = state.inputs.diameter!;
+          state.inputs.width = state.inputs.diameter!;
+          state.inputs.sideBLength = state.inputs.sideBDiameter!;
+          state.inputs.sideBWidth = state.inputs.sideBDiameter!;
+          state.isCalculated = true;
+          return;
+        }
+
+        if (state.inputs.circleCalcMode === 'fromStaveWidth') {
+          state.outputs = calculateCircleFromStaveWidth(
+            state.inputs.staveWidth!,
+            state.inputs.numberOfStaves!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+        } else {
+          state.outputs = calculateCircleFromDiameter(
+            state.inputs.diameter!,
+            state.inputs.numberOfStaves!,
+            state.anglePrecision,
+            state.inputs.staveThickness || 0
+          );
+        }
+        // Mirror the resolved diameter into the axes so the visualization and
+        // copy output, which read length/width, work unchanged.
+        state.inputs.length = state.outputs.diameter!;
+        state.inputs.width = state.outputs.diameter!;
+        state.isCalculated = true;
+        return;
+      }
+
       if (state.inputs.useConical) {
         // Conical ellipse calculations
         if (calculationMode === 'width') {
@@ -123,9 +175,20 @@ export function useEllipseCalculator() {
    * Reset calculator state
    */
   function reset(): void {
+    // Keep the shape and circle sub-mode so Reset clears the numbers without
+    // yanking the user back to ellipse mode.
+    const currentShape = state.inputs.shape;
+    const currentCircleCalcMode = state.inputs.circleCalcMode;
+    const currentTaperResultMode = state.inputs.taperResultMode;
+
     state.inputs = {
+      shape: currentShape,
       length: undefined as any,
       width: undefined as any,
+      diameter: undefined,
+      sideBDiameter: undefined,
+      circleCalcMode: currentCircleCalcMode,
+      taperResultMode: currentTaperResultMode,
       numberOfStaves: undefined,
       staveWidth: undefined,
       staveThickness: undefined,

@@ -16,12 +16,28 @@
           </q-item-section>
         </q-item>
 
-        <!-- Miter Angle -->
-        <q-item dense>
+        <!-- Miter Angle (as a degree measurement) -->
+        <q-item v-if="!isRiseRun" dense>
           <q-item-section>
             <q-item-label caption>Miter Angle</q-item-label>
             <q-item-label class="calculation-result text-body1 text-weight-medium">
               {{ results.miterAngle }}°
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <!-- Miter Angle (as a rise/run layout offset) -->
+        <q-item v-else dense>
+          <q-item-section>
+            <q-item-label caption>Miter Angle (Rise / Run)</q-item-label>
+            <q-item-label class="calculation-result text-body1 text-weight-medium">
+              Measure in {{ results.miterRise }}" over a {{ results.miterRun }}" board
+            </q-item-label>
+            <q-item-label caption class="q-mt-xs">
+              Square a line across one end of the board, measure in
+              {{ results.miterRise }}" from the corner, then draw from that mark
+              to the opposite corner {{ results.miterRun }}" away. Equivalent to
+              {{ results.miterAngle }}°.
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -91,6 +107,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Notify } from 'quasar';
 import type { PyramidOutputs } from '../types/pyramid';
 import type { PyramidInputs } from '../types/pyramid';
@@ -102,7 +119,19 @@ interface Props {
 
 const props = defineProps<Props>();
 
+// Rise/run display requires both the mode and a usable offset
+const isRiseRun = computed(
+  () =>
+    props.inputs.miterResultMode === 'riseRun' &&
+    props.results.miterRise !== null &&
+    props.results.miterRise !== undefined
+);
+
 function copyResults(): void {
+  const miterLine = isRiseRun.value
+    ? `Miter Gauge: measure in ${props.results.miterRise}" over a ${props.results.miterRun}" board (${props.results.miterAngle}°)`
+    : `Miter Gauge: ${props.results.miterAngle}°`;
+
   let text = `
 Pyramid Calculator Results
 Sides: ${props.inputs.numberOfSides}
@@ -112,7 +141,7 @@ Height: ${props.inputs.height}"
 Results:
 ========
 Base Side Length: ${props.results.baseSideLength}"
-Miter Gauge: ${props.results.miterAngle}°
+${miterLine}
 Blade Tilt (Mitered): ${props.results.bladeTiltMitered}°}
 Blade Tilt (Butted): ${props.results.bladeTiltButted}°}
 Side Slope: ${props.results.sideSlope}°

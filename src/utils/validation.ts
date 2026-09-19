@@ -7,6 +7,7 @@ import type { PyramidInputs, ValidationResult } from '../types/pyramid';
  * - Number of sides: must be integer ≥ 3, ≤ 1000
  * - Base radius: must be > 0, < 10000
  * - Height: must be > 0, < 10000
+ * - Board length: only checked in rise/run mode; must be > 0, < 10000
  * - All values must be valid numbers (not NaN)
  *
  * @param inputs - The pyramid inputs to validate
@@ -14,7 +15,7 @@ import type { PyramidInputs, ValidationResult } from '../types/pyramid';
  */
 export function validateInputs(inputs: PyramidInputs): ValidationResult {
   const errors: string[] = [];
-  const { numberOfSides, baseRadius, height } = inputs;
+  const { numberOfSides, baseRadius, height, miterResultMode, boardLength } = inputs;
 
   // Check for NaN values
   if (isNaN(numberOfSides) || numberOfSides === null || numberOfSides === undefined) {
@@ -46,6 +47,21 @@ export function validateInputs(inputs: PyramidInputs): ValidationResult {
     errors.push('Height must be greater than 0');
   } else if (height >= 10000) {
     errors.push('Height must be less than 10000');
+  }
+
+  // Board length validation (rise/run mode only)
+  if (miterResultMode === 'riseRun') {
+    if (
+      boardLength === null ||
+      boardLength === undefined ||
+      isNaN(boardLength)
+    ) {
+      errors.push('Board length must be a valid number');
+    } else if (boardLength <= 0) {
+      errors.push('Board length must be greater than 0');
+    } else if (boardLength >= 10000) {
+      errors.push('Board length must be less than 10000');
+    }
   }
 
   return {

@@ -88,7 +88,13 @@
                   <div class="text-body2">
                     <strong>Base Side Length:</strong> {{ calc.outputs.baseSideLength.toFixed(3) }} in
                   </div>
-                  <div class="text-body2">
+                  <div v-if="calc.outputs.miterRise != null" class="text-body2">
+                    <strong>Miter Angle:</strong> measure in
+                    {{ calc.outputs.miterRise.toFixed(3) }} in over a
+                    {{ calc.outputs.miterRun?.toFixed(3) }} in board
+                    ({{ calc.outputs.miterAngle.toFixed(2) }}°)
+                  </div>
+                  <div v-else class="text-body2">
                     <strong>Miter Angle:</strong> {{ calc.outputs.miterAngle.toFixed(2) }}°
                   </div>
                   <div class="text-body2">

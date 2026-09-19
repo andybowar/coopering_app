@@ -40,6 +40,39 @@
           class="q-mb-sm"
         />
 
+        <div class="q-mb-sm">
+          <div class="text-caption q-mb-xs">Miter Angle As</div>
+          <q-radio
+            v-model="localInputs.miterResultMode"
+            val="angle"
+            label="Angle"
+            color="white"
+            dense
+            class="q-mr-md"
+          />
+          <q-radio
+            v-model="localInputs.miterResultMode"
+            val="riseRun"
+            label="Rise / Run"
+            color="white"
+            dense
+          />
+        </div>
+
+        <q-input
+          v-if="localInputs.miterResultMode === 'riseRun'"
+          v-model.number="localInputs.boardLength"
+          type="number"
+          step="0.01"
+          dense
+          outlined
+          label="Board Length"
+          suffix="in"
+          hint="Length the offset is measured over"
+          :rules="[val => val > 0 || 'Must be > 0']"
+          class="q-mb-sm"
+        />
+
         <q-checkbox
           v-model="saveCalculation"
           label="Save this calculation"

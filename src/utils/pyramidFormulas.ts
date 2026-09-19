@@ -1,4 +1,5 @@
 import type { PyramidInputs, PyramidOutputs } from '../types/pyramid';
+import { angleToRiseRun } from './angleConversion';
 
 /**
  * Convert degrees to radians
@@ -41,7 +42,7 @@ export function formatResult(value: number, decimals: number = 3): number {
  * @returns PyramidOutputs with all calculated values and feasibility checks
  */
 export function calculatePyramid(inputs: PyramidInputs): PyramidOutputs {
-  const { numberOfSides, baseRadius, height } = inputs;
+  const { numberOfSides, baseRadius, height, miterResultMode, boardLength } = inputs;
   const N = numberOfSides;
   const R = baseRadius;
   const H = height;
@@ -97,6 +98,14 @@ export function calculatePyramid(inputs: PyramidInputs): PyramidOutputs {
     maxHeightFor45Deg = apothem * Math.tan(sideSlopeMaxRad);
   }
 
+  // 10. Rise/run layout offset over the user's board length (rise/run mode only).
+  // The miter angle is measured from perpendicular, so it converts as an angle
+  // from horizontal: rise = boardLength * tan(miterAngle).
+  const riseRun =
+    miterResultMode === 'riseRun' && typeof boardLength === 'number'
+      ? angleToRiseRun(miterAngle, false, boardLength)
+      : undefined;
+
   return {
     baseSideLength: formatResult(baseSideLength),
     miterAngle: formatResult(miterAngle),
@@ -104,6 +113,8 @@ export function calculatePyramid(inputs: PyramidInputs): PyramidOutputs {
     sideSlope: formatResult(sideSlope),
     bladeTiltMitered: formatResult(bladeTiltMitered),
     bladeTiltButted: formatResult(bladeTiltButted),
-    dihedralAngle: formatResult(dihedralAngle)
+    dihedralAngle: formatResult(dihedralAngle),
+    miterRun: riseRun ? formatResult(riseRun.run) : null,
+    miterRise: riseRun ? riseRun.rise : null
   };
 }

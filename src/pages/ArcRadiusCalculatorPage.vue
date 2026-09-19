@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center" style="padding: 16px;">
+  <q-page class="arc-page flex flex-center" style="padding: 16px;">
     <div class="row justify-center" style="width: 100%; max-width: 600px;">
       <div class="col-12">
         <!-- Header -->
@@ -28,49 +28,70 @@
             <q-form @submit.prevent="handleCalculate">
               <!-- Illustration -->
               <div class="arc-container q-mb-md">
+                <!--
+                  Geometry, all derived from one consistent circle so the parts
+                  actually meet: chord at y=150 spanning x 50..350 (half-chord
+                  a=150), centre at (200,200) giving an apothem of 50, so
+                  r = hypot(150,50) = 158.114 and the apex sits at
+                  y = 200 - 158.114 = 41.886 (sagitta 108.114).
+                -->
                 <svg viewBox="0 0 400 250" class="arc-svg">
-                  <!-- Chord (horizontal line at bottom) -->
-                  <line x1="50" y1="200" x2="350" y2="200"
-                        stroke="currentColor"
-                        stroke-width="2" />
-
-                  <!-- Arc (curved path above chord) -->
-                  <path d="M 50 200 Q 200 80, 350 200"
+                  <!-- Arc. A real circular arc: the previous quadratic Bezier
+                       "Q 200 80" actually peaked at y=140, so the sagitta and
+                       its marker were drawn 60px above the curve. -->
+                  <path d="M 50 150 A 158.114 158.114 0 0 1 350 150"
                         fill="none"
                         stroke="currentColor"
                         stroke-width="2" />
 
-                  <!-- Sagitta (vertical line from chord midpoint to arc) -->
-                  <line x1="200" y1="200" x2="200" y2="80"
-                        stroke="#21BA45"
+                  <!-- Chord. Solid and in its own colour: it was previously
+                       currentColor at the same weight as the arc, so the two
+                       read as one shape. -->
+                  <line x1="50" y1="150" x2="350" y2="150"
+                        class="chord-stroke"
+                        stroke-width="3" />
+
+                  <!-- Sagitta: chord midpoint up to the arc apex -->
+                  <line x1="200" y1="150" x2="200" y2="41.886"
+                        class="sagitta-stroke"
                         stroke-width="2"
                         stroke-dasharray="5,5" />
 
-                  <!-- Radius line (from center to arc endpoint) -->
-                  <line x1="200" y1="235" x2="50" y2="200"
-                        stroke="#E91E63"
+                  <!-- Radius: centre out to a chord endpoint -->
+                  <line x1="200" y1="200" x2="50" y2="150"
+                        class="radius-stroke"
                         stroke-width="2"
                         stroke-dasharray="5,5"
-                        opacity="0.6" />
+                        opacity="0.8" />
 
-                  <!-- Center point -->
-                  <circle cx="200" cy="235" r="4" fill="#E91E63" />
+                  <!-- Right-angle mark where the sagitta meets the chord -->
+                  <path d="M 188 150 L 188 138 L 200 138"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        opacity="0.45" />
 
-                  <!-- Labels -->
-                  <text x="200" y="145" text-anchor="middle" class="label-text" fill="#21BA45">Sagitta (h)</text>
-                  <text x="200" y="225" text-anchor="middle" class="label-text">Chord (c)</text>
-                  <text x="115" y="230" text-anchor="middle" class="label-text" fill="#E91E63">Radius (r)</text>
+                  <!-- Centre point -->
+                  <circle cx="200" cy="200" r="4" class="radius-fill" />
 
-                  <!-- Endpoint markers -->
-                  <circle cx="50" cy="200" r="3" fill="currentColor" />
-                  <circle cx="350" cy="200" r="3" fill="currentColor" />
-                  <circle cx="200" cy="80" r="3" fill="#21BA45" />
+                  <!-- Endpoint markers. These are the chord's endpoints, so
+                       they carry the chord colour. -->
+                  <circle cx="50" cy="150" r="4" class="chord-fill" />
+                  <circle cx="350" cy="150" r="4" class="chord-fill" />
+                  <circle cx="200" cy="41.886" r="3" class="sagitta-fill" />
+
+                  <!-- Labels, each matching the element it names -->
+                  <text x="210" y="100" text-anchor="start" class="label-text sagitta-fill">Sagitta (h)</text>
+                  <text x="290" y="170" text-anchor="middle" class="label-text chord-fill">Chord (c)</text>
+                  <text x="118" y="190" text-anchor="middle" class="label-text radius-fill">Radius (r)</text>
+                  <text x="200" y="222" text-anchor="middle" class="label-text radius-fill" opacity="0.75">Centre</text>
                 </svg>
               </div>
 
               <!-- Input Fields -->
               <div class="inputs-grid">
-                <!-- Sagitta Input -->
+                <!-- Sagitta Input. The colour swatch ties each field back to
+                     the matching line in the diagram above. -->
                 <q-input
                   v-model.number="state.inputs.sagitta"
                   type="number"
@@ -83,7 +104,11 @@
                   :readonly="hasResults"
                   :filled="hasResults"
                   class="q-mb-sm"
-                />
+                >
+                  <template v-slot:prepend>
+                    <span class="swatch swatch-sagitta" aria-hidden="true" />
+                  </template>
+                </q-input>
 
                 <!-- Chord Length Input -->
                 <q-input
@@ -98,7 +123,11 @@
                   :readonly="hasResults"
                   :filled="hasResults"
                   class="q-mb-sm"
-                />
+                >
+                  <template v-slot:prepend>
+                    <span class="swatch swatch-chord" aria-hidden="true" />
+                  </template>
+                </q-input>
               </div>
 
               <!-- Action Buttons -->
@@ -143,7 +172,9 @@
           <q-card-section class="q-pa-sm">
             <div class="results-grid">
               <div class="result-item">
-                <div class="text-caption text-grey-7">Radius</div>
+                <div class="text-caption text-grey-7">
+                  <span class="swatch swatch-radius" aria-hidden="true" />Radius
+                </div>
                 <div class="text-h6 text-weight-medium">{{ state.outputs.radius }}"</div>
               </div>
 
@@ -174,9 +205,9 @@
                   <strong>Definitions:</strong>
                 </p>
                 <ul class="q-ma-none q-pl-md q-mb-sm">
-                  <li><strong>Sagitta (h):</strong> The height of the arc from the midpoint of the chord to the highest point of the arc</li>
-                  <li><strong>Chord (c):</strong> The straight-line distance across the arc's endpoints</li>
-                  <li><strong>Radius (r):</strong> The distance from the arc's center point to any point on the arc</li>
+                  <li><strong class="term-sagitta">Sagitta (h):</strong> The height of the arc from the midpoint of the chord to the highest point of the arc</li>
+                  <li><strong class="term-chord">Chord (c):</strong> The straight-line distance between the arc's two endpoints</li>
+                  <li><strong class="term-radius">Radius (r):</strong> The distance from the arc's center point to any point on the arc</li>
                 </ul>
                 <p class="q-ma-none q-mb-sm">
                   <strong>Formula:</strong> r = (h/2) + (c²/(8h))
@@ -237,6 +268,52 @@ Diameter: ${state.outputs.diameter}"`;
 </script>
 
 <style scoped>
+/*
+  Colour coding for the three quantities. Defined once here and referenced by
+  the diagram, the input fields, the result, and the definitions list, so the
+  four can never drift apart.
+
+  The arc itself deliberately stays currentColor: it is the shape being
+  measured, not one of the measurements.
+*/
+.arc-page {
+  /*
+    Contrast ratios against the dark card (#2d3748), which needs >= 3:1 for
+    non-text graphics: green 4.67:1, blue 3.84:1, pink 3.92:1. The pink was
+    previously #e91e63, which only reached 2.76:1.
+  */
+  --arc-sagitta: #21ba45;
+  --arc-chord: #2196f3;
+  --arc-radius: #f06292;
+}
+
+.sagitta-stroke { stroke: var(--arc-sagitta); }
+.chord-stroke { stroke: var(--arc-chord); }
+.radius-stroke { stroke: var(--arc-radius); }
+
+.sagitta-fill { fill: var(--arc-sagitta); }
+.chord-fill { fill: var(--arc-chord); }
+.radius-fill { fill: var(--arc-radius); }
+
+.term-sagitta { color: var(--arc-sagitta); }
+.term-chord { color: var(--arc-chord); }
+.term-radius { color: var(--arc-radius); }
+
+/* Small colour chip shown beside the inputs and the radius result */
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+  flex: 0 0 auto;
+}
+
+.swatch-sagitta { background-color: var(--arc-sagitta); }
+.swatch-chord { background-color: var(--arc-chord); }
+.swatch-radius { background-color: var(--arc-radius); }
+
 .arc-container {
   width: 100%;
   max-width: 400px;

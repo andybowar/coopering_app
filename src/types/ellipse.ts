@@ -1,9 +1,31 @@
+import type { AngleInputMode } from './angleInput';
+
+/**
+ * Cross-section shape being coopered.
+ *
+ * A circle is just an ellipse with equal axes, but it gets its own mode so the
+ * user enters one diameter instead of two identical axes, and so the
+ * diameter-from-stave-width solve stays available (it is only meaningful when
+ * every stave is the same width).
+ */
+export type CoopShape = 'ellipse' | 'circle';
+
+/**
+ * Which quantity the user knows in circle mode
+ */
+export type CircleCalcMode = 'fromDiameter' | 'fromStaveWidth';
+
 /**
  * Ellipse coopering inputs
  */
 export interface EllipseInputs {
+  shape: CoopShape;  // Ellipse (two axes) or circle (single diameter)
   length: number;  // Major axis (horizontal) in inches
   width: number;   // Minor axis (vertical) in inches
+  diameter?: number;  // Diameter in circle mode (mirrored into length/width)
+  sideBDiameter?: number;  // Side B diameter for a conical circle (cone / frustum)
+  circleCalcMode?: CircleCalcMode;  // Circle mode: known diameter or known stave width
+  taperResultMode?: AngleInputMode;  // Report taper as an angle or a rise/run offset
   numberOfStaves?: number;  // Number of staves in one quarter
   staveWidth?: number;  // Desired average stave width (alternative to numberOfStaves)
   staveThickness?: number;  // Thickness of stave material in inches
@@ -28,6 +50,8 @@ export interface EllipseStaveInfo {
   sideBConvexWidth?: number;  // Side B convex width for conical staves
   length?: number;  // Stave length (depth) for conical staves
   taperAngle?: number;  // Taper angle from perpendicular (for conical staves)
+  taperRise?: number;  // Rise/run form of the taper: offset to measure in on ONE edge
+  taperRun?: number;  // Rise/run form of the taper: the stave length it is measured over
 }
 
 /**
@@ -36,6 +60,7 @@ export interface EllipseStaveInfo {
 export interface EllipseOutputs {
   staves: EllipseStaveInfo[];
   totalStaves: number;  // Total number of staves calculated
+  diameter?: number;  // Circle mode only; derived when calculating from stave width
 }
 
 /**

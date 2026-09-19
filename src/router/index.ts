@@ -7,7 +7,6 @@ import TrigCalculatorPage from '../pages/TrigCalculatorPage.vue';
 import GeneralTriangleCalculatorPage from '../pages/GeneralTriangleCalculatorPage.vue';
 import ArcRadiusCalculatorPage from '../pages/ArcRadiusCalculatorPage.vue';
 import CurveCooperingPage from '../pages/CurveCooperingPage.vue';
-import CylinderCooperingPage from '../pages/CylinderCooperingPage.vue';
 import EllipseCalculatorPage from '../pages/EllipseCalculatorPage.vue';
 import ReferenceChartsPage from '../pages/ReferenceChartsPage.vue';
 import SavedCalculationsPage from '../pages/SavedCalculationsPage.vue';
@@ -21,7 +20,9 @@ const routes = [
       { path: 'pyramid', component: IndexPage },
       { path: 'box', component: BoxCalculatorPage },
       { path: 'curve', component: CurveCooperingPage },
-      { path: 'cylinder', component: CylinderCooperingPage },
+      // Cylinder coopering merged into the ellipse calculator's Circle mode.
+      // Kept as a redirect so existing links and the installed PWA still work.
+      { path: 'cylinder', redirect: '/ellipse' },
       { path: 'ellipse', component: EllipseCalculatorPage },
       { path: 'trig-right', component: TrigCalculatorPage },
       { path: 'trig-general', component: GeneralTriangleCalculatorPage },

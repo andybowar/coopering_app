@@ -24,19 +24,21 @@ export function riseRunToAngle(
  * Convert an angle in degrees to rise/run values
  * @param angleDegrees - The angle in degrees
  * @param fromVertical - Whether the angle is measured from vertical (true) or horizontal (false)
- * @returns Rise and run values (run defaults to 12), or undefined if angle is invalid
+ * @param run - The run to measure the rise over (defaults to 12, the standard carpentry value)
+ * @returns Rise and run values, or undefined if the angle or run is invalid
  */
 export function angleToRiseRun(
   angleDegrees: number | undefined,
-  fromVertical: boolean = false
+  fromVertical: boolean = false,
+  run: number = 12
 ): { rise: number; run: number } | undefined {
   if (angleDegrees === undefined) return undefined;
+  if (isNaN(run) || run <= 0) return undefined;
 
   // Adjust if measuring from vertical
   const adjustedAngle = fromVertical ? 90 - angleDegrees : angleDegrees;
   const angleRadians = (adjustedAngle * Math.PI) / 180;
 
-  const run = 12; // Standard carpentry value
   const rise = Math.tan(angleRadians) * run;
   return { rise: Number(rise.toFixed(3)), run };
 }

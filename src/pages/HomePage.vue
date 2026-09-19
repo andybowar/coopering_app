@@ -54,27 +54,14 @@
           </q-card>
         </div>
 
-        <!-- Cylinder Coopering -->
-        <div class="col-6">
-          <q-card flat bordered class="feature-card cursor-pointer" @click="navigateTo('/cylinder')">
-            <q-card-section class="text-center q-pa-sm">
-              <q-icon name="fiber_manual_record" size="48px" color="primary" class="q-mb-xs" />
-              <div class="text-subtitle2 text-weight-medium q-mb-xs">Cylinder</div>
-              <div class="text-caption text-grey-7">
-                Dimensions for cylindrical coopering
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-
-        <!-- Ellipse Coopering -->
+        <!-- Ellipse & Cylinder Coopering -->
         <div class="col-6">
           <q-card flat bordered class="feature-card cursor-pointer" @click="navigateTo('/ellipse')">
             <q-card-section class="text-center q-pa-sm">
               <q-icon name="panorama_fish_eye" size="48px" color="primary" class="q-mb-xs" />
-              <div class="text-subtitle2 text-weight-medium q-mb-xs">Ellipse</div>
+              <div class="text-subtitle2 text-weight-medium q-mb-xs">Ellipse &amp; Cylinder</div>
               <div class="text-caption text-grey-7">
-                Blade tilts for quarter ellipse sections
+                Blade tilts for ellipse and circle sections
               </div>
             </q-card-section>
           </q-card>

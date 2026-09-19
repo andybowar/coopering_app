@@ -1,6 +1,14 @@
 import type { EllipseInputs, EllipseOutputs, EllipseStaveInfo } from '../types/ellipse';
 
 /**
+ * Fewest staves a closed cross-section can be built from.
+ *
+ * A triangle is a legitimate (if unusual) coopering job, and the sampling math
+ * below handles it exactly, so the floor is 3 rather than 4.
+ */
+export const MIN_STAVES = 3;
+
+/**
  * Convert degrees to radians
  */
 function toRadians(degrees: number): number {
@@ -77,7 +85,7 @@ export function calculateEllipseFromStaves(
   anglePrecision: number = 1,
   staveThickness: number = 0
 ): EllipseOutputs {
-  if (length <= 0 || width <= 0 || numberOfStaves < 4) {
+  if (length <= 0 || width <= 0 || numberOfStaves < MIN_STAVES) {
     throw new Error('Invalid inputs');
   }
 
@@ -185,11 +193,11 @@ export function calculateEllipseFromWidth(
   const b = width / 2;
 
   // Try different numbers of staves to find the best match
-  let bestNumberOfStaves = 4;
+  let bestNumberOfStaves = MIN_STAVES;
   let smallestDifference = Infinity;
 
-  // Search from 4 to a reasonable maximum (200 staves for full ellipse)
-  for (let testStaves = 4; testStaves <= 200; testStaves++) {
+  // Search from MIN_STAVES to a reasonable maximum (200 staves for full ellipse)
+  for (let testStaves = MIN_STAVES; testStaves <= 200; testStaves++) {
     const angleStep = (2 * Math.PI) / testStaves;
     let totalChordLength = 0;
 
@@ -222,6 +230,104 @@ export function calculateEllipseFromWidth(
 }
 
 /**
+ * Calculate circle (cylinder) coopering from a known diameter.
+ *
+ * A circle is an ellipse with equal axes, so this mirrors the diameter into
+ * both axes and reuses the ellipse solver. Every stave comes out identical.
+ */
+export function calculateCircleFromDiameter(
+  diameter: number,
+  numberOfStaves: number,
+  anglePrecision: number = 1,
+  staveThickness: number = 0
+): EllipseOutputs {
+  if (diameter <= 0 || numberOfStaves < MIN_STAVES) {
+    throw new Error('Invalid inputs');
+  }
+
+  const results = calculateEllipseFromStaves(
+    diameter,
+    diameter,
+    numberOfStaves,
+    anglePrecision,
+    staveThickness
+  );
+
+  return { ...results, diameter: formatResult(diameter, 4) };
+}
+
+/**
+ * Calculate circle (cylinder) coopering from a known stave width.
+ *
+ * Solves for the diameter that a given number of staves of a given width will
+ * close into, then reuses the ellipse solver for the rest.
+ *
+ * Staves are chords of the circle, so for N staves of width w:
+ *   w = D * sin(pi/N)  =>  D = w / sin(pi/N)
+ *
+ * Note this is a different question from the ellipse's from-stave-width mode,
+ * which holds the dimensions fixed and solves for the stave count instead.
+ */
+export function calculateCircleFromStaveWidth(
+  staveWidth: number,
+  numberOfStaves: number,
+  anglePrecision: number = 1,
+  staveThickness: number = 0
+): EllipseOutputs {
+  if (staveWidth <= 0 || numberOfStaves < MIN_STAVES) {
+    throw new Error('Invalid inputs');
+  }
+
+  const diameter = staveWidth / Math.sin(Math.PI / numberOfStaves);
+
+  const results = calculateEllipseFromStaves(
+    diameter,
+    diameter,
+    numberOfStaves,
+    anglePrecision,
+    staveThickness
+  );
+
+  return { ...results, diameter: formatResult(diameter, 4) };
+}
+
+/**
+ * Calculate conical circle coopering: a cone or truncated cone (frustum).
+ *
+ * Both ends are circles of different diameters, so every stave is an identical
+ * symmetric trapezoid. Mirrors each diameter into both axes and reuses the
+ * conical ellipse solver.
+ *
+ * Declared after calculateConicalEllipseFromStaves is defined at module scope;
+ * function declarations hoist, so the ordering here is only for readability.
+ */
+export function calculateConicalCircleFromDiameters(
+  frontDiameter: number,
+  backDiameter: number,
+  depth: number,
+  numberOfStaves: number,
+  anglePrecision: number = 1,
+  staveThickness: number = 0
+): EllipseOutputs {
+  if (frontDiameter <= 0 || backDiameter <= 0 || depth <= 0 || numberOfStaves < MIN_STAVES) {
+    throw new Error('Invalid inputs');
+  }
+
+  const results = calculateConicalEllipseFromStaves(
+    frontDiameter,
+    frontDiameter,
+    backDiameter,
+    backDiameter,
+    depth,
+    numberOfStaves,
+    anglePrecision,
+    staveThickness
+  );
+
+  return { ...results, diameter: formatResult(frontDiameter, 4) };
+}
+
+/**
  * Calculate conical ellipse coopering from number of staves
  */
 export function calculateConicalEllipseFromStaves(
@@ -234,7 +340,7 @@ export function calculateConicalEllipseFromStaves(
   anglePrecision: number = 1,
   staveThickness: number = 0
 ): EllipseOutputs {
-  if (frontLength <= 0 || frontWidth <= 0 || backLength <= 0 || backWidth <= 0 || depth <= 0 || numberOfStaves < 4) {
+  if (frontLength <= 0 || frontWidth <= 0 || backLength <= 0 || backWidth <= 0 || depth <= 0 || numberOfStaves < MIN_STAVES) {
     throw new Error('Invalid inputs');
   }
 
@@ -250,10 +356,17 @@ export function calculateConicalEllipseFromStaves(
     const frontStave = frontResults.staves[i];
     const backStave = backResults.staves[i];
 
-    // Calculate taper angle (always positive, from narrow to wide)
+    // Calculate taper angle (always positive, from narrow to wide).
+    // The stave is a symmetric trapezoid, so the total width change is split
+    // evenly between its two long edges: each edge moves widthDiff/2.
     const widthDiff = Math.abs(backStave.concaveWidth - frontStave.concaveWidth);
     const taperAngleRad = Math.atan(widthDiff / (2 * depth));
     const taperAngle = formatResult(toDegrees(taperAngleRad), anglePrecision);
+
+    // Rise/run form of the same taper, for marking out instead of setting an
+    // angle. Equal to depth * tan(taperAngle), but taken directly from the
+    // width difference to avoid rounding through the angle.
+    const taperRise = widthDiff / 2;
 
     const stave: EllipseStaveInfo = {
       index: i + 1,
@@ -264,7 +377,9 @@ export function calculateConicalEllipseFromStaves(
       concaveWidth: frontStave.concaveWidth,
       sideBConcaveWidth: formatResult(backStave.concaveWidth, 4),
       length: formatResult(depth, 4),
-      taperAngle: taperAngle
+      taperAngle: taperAngle,
+      taperRise: formatResult(taperRise, 4),
+      taperRun: formatResult(depth, 4)
     };
 
     // Add convex widths if thickness is specified

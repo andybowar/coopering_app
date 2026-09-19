@@ -14,7 +14,9 @@ export function usePyramidCalculator() {
     inputs: {
       numberOfSides: 6,
       baseRadius: 10,
-      height: 8
+      height: 8,
+      miterResultMode: 'angle',
+      boardLength: 10
     },
     outputs: null,
     isCalculated: false,
@@ -74,8 +76,14 @@ export function usePyramidCalculator() {
 
   /**
    * Update specific input value
+   *
+   * Generic over the field so each key gets its own value type; PyramidInputs
+   * is no longer all-number now that miterResultMode is in it.
    */
-  function updateInput(field: keyof PyramidInputs, value: number): void {
+  function updateInput<K extends keyof PyramidInputs>(
+    field: K,
+    value: PyramidInputs[K]
+  ): void {
     state.inputs[field] = value;
   }
 

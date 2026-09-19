@@ -10,7 +10,7 @@ export interface Point {
  * Curve coopering inputs
  */
 export interface CurveCoopInputs {
-  mode: 'draw' | 'radius' | 'cylinder';  // Calculation mode
+  mode: 'draw' | 'radius';  // Calculation mode
   totalLength?: number;  // Real-world length in inches (chord length for radius mode)
   totalHeight?: number;  // Real-world height in inches (only for draw mode)
   radius?: number;  // Front radius in inches (only for radius mode)
@@ -18,9 +18,6 @@ export interface CurveCoopInputs {
   depth?: number;  // Depth from front to back in inches (only when backRadius is used)
   numberOfStaves?: number;  // Number of segments
   useTaper: boolean;  // Whether to use tapered mode with different front/back radii
-  cylinderCalcMode?: 'fromDiameter' | 'fromStaveWidth';  // Cylinder calculation mode
-  diameter?: number;  // Diameter for cylinder mode
-  staveWidth?: number;  // Stave width for cylinder mode
   staveThickness?: number;  // Thickness of stave material in inches
 }
 
@@ -58,17 +55,6 @@ export interface ValidationResult {
 }
 
 /**
- * Cylinder calculation results
- */
-export interface CylinderResults {
-  diameter?: number;
-  staveWidth?: number;
-  convexWidth?: number;
-  bladeTiltAngle: number;
-  numberOfStaves: number;
-}
-
-/**
  * Complete state
  */
 export interface CurveCoopState {
@@ -76,7 +62,6 @@ export interface CurveCoopState {
   smoothedCurve: Point[];
   inputs: CurveCoopInputs;
   outputs: CurveCoopOutputs | null;
-  cylinderResults: CylinderResults | null;
   isCalculated: boolean;
   errors: string[];
   anglePrecision: number;  // Number of decimal places for angles (2 or 3)
