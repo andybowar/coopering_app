@@ -259,7 +259,7 @@
             <div class="visualization-container q-mb-md">
               <div class="text-caption text-grey-7 q-mb-xs">
                 Cross-Section View
-                <span class="text-grey-6"> • Pinch to zoom • Double tap to reset</span>
+                <span class="text-grey-6"> • Scroll or pinch to zoom • Drag to pan • Double-click to reset</span>
               </div>
               <svg ref="svgRef" viewBox="0 0 400 280" class="cross-section-svg">
                 <g :transform="transformAttr(200, 140)">
@@ -317,7 +317,7 @@
                       :y="bisector.labelY"
                       text-anchor="middle"
                       class="angle-label-svg"
-                      :font-size="labelFontSize"
+                      font-size="14"
                     >
                       {{ bisector.angle }}°
                     </text>
@@ -478,7 +478,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Notify } from 'quasar';
 import { useCurveCoopCalculator } from '../composables/useCurveCoopCalculator';
 import { usePinchZoom } from '../composables/usePinchZoom';
@@ -495,19 +495,8 @@ const desiredStaveWidth = ref<number | undefined>(undefined);
 
 // Pinch-to-zoom for visualization
 const svgRef = ref<SVGElement | null>(null);
-const { transformAttr, inverseScale, scale } = usePinchZoom(svgRef);
+const { transformAttr } = usePinchZoom(svgRef);
 
-// Computed font size that scales with zoom
-const labelFontSize = computed(() => {
-  const size = 14 * scale.value;
-  console.log('Curve label font size:', size, 'scale:', scale.value);
-  return size;
-});
-
-// Debug scale changes
-watch(scale, (newVal) => {
-  console.log('Curve scale changed:', newVal);
-});
 
 onMounted(() => {
   // Load angle precision preference from localStorage
@@ -834,9 +823,6 @@ function copyResults(): void {
   overflow: hidden;
 }
 
-.cross-section-svg g {
-  transition: transform 0.1s ease-out;
-}
 
 .angle-label-svg {
   font-weight: 600;

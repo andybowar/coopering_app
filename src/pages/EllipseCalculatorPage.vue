@@ -399,7 +399,7 @@
             <div class="visualization-container q-mb-md">
               <div class="text-caption text-grey-7 q-mb-xs">
                 Quarter Ellipse View
-                <span class="text-grey-6"> • Pinch to zoom • Double tap to reset</span>
+                <span class="text-grey-6"> • Scroll or pinch to zoom • Drag to pan • Double-click to reset</span>
               </div>
               <svg ref="svgRef" viewBox="-10 -10 420 320" class="ellipse-svg">
                 <g :transform="transformAttr(200, 145)">
@@ -454,7 +454,7 @@
                         text-anchor="middle"
                         dominant-baseline="middle"
                         class="angle-label-svg"
-                        :font-size="labelFontSize"
+                        font-size="14"
                       >
                         {{ stave.startBladeTilt }}°
                       </text>
@@ -479,7 +479,7 @@
                         text-anchor="middle"
                         dominant-baseline="middle"
                         class="angle-label-svg"
-                        :font-size="labelFontSize"
+                        font-size="14"
                       >
                         {{ stave.endBladeTilt }}°
                       </text>
@@ -633,7 +633,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Notify } from 'quasar';
 import { useEllipseCalculator } from '../composables/useEllipseCalculator';
 import { usePinchZoom } from '../composables/usePinchZoom';
@@ -658,19 +658,8 @@ const isTaperRiseRun = computed(
 
 // Pinch-to-zoom for visualization
 const svgRef = ref<SVGElement | null>(null);
-const { transformAttr, inverseScale, resetZoom, scale } = usePinchZoom(svgRef);
+const { transformAttr, resetZoom } = usePinchZoom(svgRef);
 
-// Computed font size that scales with zoom
-const labelFontSize = computed(() => {
-  const size = 14 * scale.value;
-  console.log('Ellipse label font size:', size, 'scale:', scale.value);
-  return size;
-});
-
-// Debug scale changes
-watch(scale, (newVal) => {
-  console.log('Ellipse scale changed:', newVal);
-});
 
 // Table columns configuration
 const tableColumns = computed<QTableColumn[]>(() => {
@@ -1146,9 +1135,6 @@ function getLabelY(angleDegrees: number): number {
   overflow: hidden;
 }
 
-.ellipse-svg g {
-  transition: transform 0.1s ease-out;
-}
 
 .angle-label-svg {
   fill: #f57c00;

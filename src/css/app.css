@@ -166,3 +166,13 @@ body.q-dark,
   background-color: #2d3748 !important;
   color: #e2e8f0 !important;
 }
+
+/* Pan/zoom graphics (see usePinchZoom) */
+svg.pan-zoom {
+  cursor: grab;
+  touch-action: none;
+}
+
+svg.pan-zoom.is-panning {
+  cursor: grabbing;
+}
