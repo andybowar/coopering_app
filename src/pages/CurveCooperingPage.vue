@@ -168,6 +168,21 @@
                   :rules="[val => val > 0 || 'Must be > 0']"
                 />
 
+                <!-- Taper reporting: angle on the saw, or an offset to mark out -->
+                <div v-if="state.inputs.useTaper" class="q-mb-sm">
+                  <div class="text-caption text-grey-7 q-mb-xs">Taper as:</div>
+                  <q-btn-toggle
+                    v-model="state.inputs.taperResultMode"
+                    :options="[
+                      { label: 'Angle', value: 'angle' },
+                      { label: 'Rise / Run', value: 'riseRun' }
+                    ]"
+                    spread
+                    toggle-color="green"
+                    toggle-text-color="black"
+                  />
+                </div>
+
                 <!-- Calculation Mode -->
                 <div class="q-mb-sm">
                   <div class="text-caption text-grey-7 q-mb-xs">I know the:</div>
@@ -387,10 +402,30 @@
                     <div class="text-h6 text-weight-bold">{{ state.outputs.staves[0].bladeTiltAngle }}°</div>
                   </div>
                   <div class="col">
-                    <div class="text-caption text-grey-6">Taper Angle</div>
-                    <div class="text-h6 text-weight-bold">{{ state.outputs.staves[0].taperAngle }}°</div>
+                    <div class="text-caption text-grey-6">
+                      {{ isTaperRiseRun ? 'Taper In (per edge)' : 'Taper Angle' }}
+                    </div>
+                    <div class="text-h6 text-weight-bold">
+                      <template v-if="isTaperRiseRun">{{ state.outputs.staves[0].taperRise }}"</template>
+                      <template v-else>{{ state.outputs.staves[0].taperAngle }}°</template>
+                    </div>
+                    <div v-if="isTaperRiseRun" class="text-caption text-grey-6">
+                      over {{ state.outputs.staves[0].taperRun }}" ({{ state.outputs.staves[0].taperAngle }}°)
+                    </div>
                   </div>
                 </div>
+
+                <!-- Rise/run taper needs the both-edges caveat spelled out -->
+                <q-banner v-if="isTaperRiseRun" dense class="info-banner q-mb-md" rounded>
+                  <div class="text-caption">
+                    <strong>Taper In</strong> is the offset for <strong>one</strong> long edge,
+                    measured over the {{ state.outputs.staves[0].taperRun }}" stave length.
+                    <strong>Both</strong> long edges must be tapered by this amount, so the stave
+                    narrows by twice this figure overall. Working from the wide end, measure in
+                    {{ state.outputs.staves[0].taperRise }}" from each edge at the narrow end
+                    and draw to the wide-end corners.
+                  </div>
+                </q-banner>
                 <div class="row q-col-gutter-md q-mb-sm">
                   <div class="col">
                     <div class="text-caption text-grey-6">Front Concave</div>
@@ -484,6 +519,14 @@ import { useCurveCoopCalculator } from '../composables/useCurveCoopCalculator';
 import { usePinchZoom } from '../composables/usePinchZoom';
 
 const { state, hasResults, hasErrors, calculate: baseCalculate, reset } = useCurveCoopCalculator();
+
+// Taper shown as a mark-out offset over the stave length instead of an angle
+const isTaperRiseRun = computed(
+  () =>
+    state.inputs.useTaper &&
+    state.inputs.taperResultMode === 'riseRun' &&
+    state.outputs?.staves[0]?.taperRise !== undefined
+);
 
 // UI mode toggles
 const radiusSpecMode = ref<'known' | 'sagitta'>('known');
@@ -765,7 +808,11 @@ function copyResults(): void {
 
   if (firstStave.backWidth) {
     // Tapered stave
-    text += `Taper Angle: ${firstStave.taperAngle}°\n`;
+    if (isTaperRiseRun.value) {
+      text += `Taper: measure in ${firstStave.taperRise}" on EACH long edge over the ${firstStave.taperRun}" length (${firstStave.taperAngle}°)\n`;
+    } else {
+      text += `Taper Angle: ${firstStave.taperAngle}°\n`;
+    }
     text += `Front Concave Width: ${firstStave.width}"\n`;
     text += `Back Concave Width: ${firstStave.backWidth}"\n`;
     if (firstStave.convexWidth) {

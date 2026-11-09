@@ -374,6 +374,12 @@ export function calculateTaperedCoop(
   const taperAngleRad = Math.atan(widthDifference / (2 * depth));
   const taperAngle = toDegrees(taperAngleRad);
 
+  // Rise/run form of the same taper, for marking out instead of setting an
+  // angle: over the stave length (run), each long edge moves in by half the
+  // width difference (rise). Taken directly from the widths to avoid rounding
+  // through the angle.
+  const taperRise = Math.abs(widthDifference) / 2;
+
   // Generate staves
   const staves: StaveInfo[] = [];
   for (let i = 0; i < numberOfStaves; i++) {
@@ -383,7 +389,9 @@ export function calculateTaperedCoop(
       width: formatResult(frontConcaveWidth, 4),
       backWidth: formatResult(backConcaveWidth, 4),
       length: formatResult(depth, 4),
-      taperAngle: formatResult(taperAngle, anglePrecision)
+      taperAngle: formatResult(taperAngle, anglePrecision),
+      taperRise: formatResult(taperRise, 4),
+      taperRun: formatResult(depth, 4)
     };
     if (frontConvexWidth !== undefined && backConvexWidth !== undefined) {
       stave.convexWidth = formatResult(frontConvexWidth, 4);

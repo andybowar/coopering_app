@@ -19,7 +19,8 @@ export function useCurveCoopCalculator() {
       depth: undefined,
       numberOfStaves: undefined,
       useTaper: false,
-      staveThickness: undefined
+      staveThickness: undefined,
+      taperResultMode: 'angle'
     },
     outputs: null,
     isCalculated: false,
@@ -90,6 +91,7 @@ export function useCurveCoopCalculator() {
   function reset(): void {
     const currentMode = state.inputs.mode; // Preserve mode
     const currentUseTaper = state.inputs.useTaper; // Preserve taper setting
+    const currentTaperResultMode = state.inputs.taperResultMode;
     state.inputs = {
       mode: currentMode,
       totalLength: undefined,
@@ -99,7 +101,8 @@ export function useCurveCoopCalculator() {
       depth: undefined,
       numberOfStaves: undefined,
       useTaper: currentUseTaper,
-      staveThickness: undefined
+      staveThickness: undefined,
+      taperResultMode: currentTaperResultMode
     };
     state.outputs = null;
     state.isCalculated = false;

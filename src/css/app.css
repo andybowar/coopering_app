@@ -69,8 +69,15 @@ body {
   background-color: #4a5568;
 }
 
-.q-banner {
+.q-banner:not(.info-banner) {
   background-color: #fc8181 !important;
+}
+
+/* Neutral explanatory banners (not errors) */
+.q-banner.info-banner {
+  background-color: #1a202c;
+  color: #cbd5e0;
+  border-left: 3px solid #9ae6b4;
 }
 
 .q-field--outlined .q-field__control:before {

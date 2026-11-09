@@ -1,3 +1,5 @@
+import type { AngleInputMode } from './angleInput';
+
 /**
  * Point in 2D space
  */
@@ -19,6 +21,7 @@ export interface CurveCoopInputs {
   numberOfStaves?: number;  // Number of segments
   useTaper: boolean;  // Whether to use tapered mode with different front/back radii
   staveThickness?: number;  // Thickness of stave material in inches
+  taperResultMode?: AngleInputMode;  // Report taper as an angle or a rise/run offset
 }
 
 /**
@@ -33,6 +36,8 @@ export interface StaveInfo {
   backConvexWidth?: number;  // Back convex width for tapered staves
   length?: number;  // Stave length (depth) for tapered staves
   taperAngle?: number;  // Taper angle from perpendicular (for tapered staves)
+  taperRise?: number;  // Rise/run form of the taper: offset to measure in on ONE edge at the narrow end
+  taperRun?: number;  // Rise/run form of the taper: the stave length it is measured over
 }
 
 /**

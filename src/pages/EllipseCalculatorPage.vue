@@ -508,7 +508,7 @@
               </div>
 
               <!-- Rise/run taper needs the both-edges caveat spelled out -->
-              <q-banner v-if="isTaperRiseRun" dense class="bg-grey-9 text-grey-3 q-mb-sm" rounded>
+              <q-banner v-if="isTaperRiseRun" dense class="info-banner q-mb-sm" rounded>
                 <div class="text-caption">
                   <strong>Taper In</strong> is the offset for <strong>one</strong> long edge,
                   measured over the {{ state.outputs?.staves[0]?.taperRun }}" stave length.
