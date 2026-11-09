@@ -2,6 +2,12 @@
 
 const { configure } = require('quasar/wrappers');
 
+// GitHub Pages serves this repo from https://<user>.github.io/coopering_app/,
+// so assets need a sub-path prefix. Native (Capacitor) builds must stay at '/'.
+const ghPagesBase = process.env.DEPLOY_TARGET === 'gh-pages'
+  ? (process.env.GH_PAGES_BASE || '/coopering_app/')
+  : undefined;
+
 module.exports = configure(function (/* ctx */) {
   return {
     boot: [],
@@ -22,6 +28,8 @@ module.exports = configure(function (/* ctx */) {
       },
 
       vueRouterMode: 'hash',
+
+      ...(ghPagesBase ? { publicPath: ghPagesBase } : {})
     },
 
     devServer: {
@@ -48,7 +56,7 @@ module.exports = configure(function (/* ctx */) {
     animations: [],
 
     pwa: {
-      workboxMode: 'generateSW',
+      workboxMode: 'GenerateSW',
       injectPwaMetaTags: true,
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',

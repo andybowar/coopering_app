@@ -14,19 +14,19 @@
             The side angle can be measured from either vertical or horizontal. Choose the measurement that's most convenient for your setup.
           </p>
           <div class="text-subtitle1 text-weight-medium q-mb-sm">From Vertical</div>
-          <img src="/box_angle_from_vertical.jpg" alt="Angle from Vertical" class="illustration-image q-mb-sm">
+          <img :src="assetUrl('box_angle_from_vertical.jpg')" alt="Angle from Vertical" class="illustration-image q-mb-sm">
           <div class="text-subtitle1 text-weight-medium q-mb-sm">From Horizontal</div>
-          <img src="/box_angle_from_horizontal.jpg" alt="Angle from Horizontal" class="illustration-image q-mb-md">
+          <img :src="assetUrl('box_angle_from_horizontal.jpg')" alt="Angle from Horizontal" class="illustration-image q-mb-md">
           <!-- <div class="text-subtitle1 text-weight-medium q-mt-md q-mb-xs">Base Radius</div>
           <p class="text-grey-7 q-ma-none q-mb-sm">
             The base radius is the distance from the center of the box's base to the middle of one of the sides. If you think about the base as a circle contained in a polygon, the base radius is the radius of that circle.
           </p>
-          <img src="/box_radius_illustration.jpg" alt="Base Radius Illustration" class="illustration-image q-mb-md">
+          <img :src="assetUrl('box_radius_illustration.jpg')" alt="Base Radius Illustration" class="illustration-image q-mb-md">
           <div class="text-subtitle1 text-weight-medium q-mt-md q-mb-xs">Height</div>
           <p class="text-grey-7 q-ma-none q-mb-sm">
             The height is the distance from the bottom of the box to the top. It should not be confused with the length of the side pieces.
           </p>
-          <img src="/box_height_illustration.jpg" alt="Height Illustration" class="illustration-image"> -->
+          <img :src="assetUrl('box_height_illustration.jpg')" alt="Height Illustration" class="illustration-image"> -->
         </div>
 
         <!-- Error Banner -->
@@ -146,6 +146,7 @@ import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useBoxCalculator } from '../composables/useBoxCalculator';
 import { saveBoxCalculation } from '../utils/storage';
+import { assetUrl } from '../utils/assetUrl';
 import type { SavedBoxCalculation } from '../types/box';
 import BoxCalculatorForm from '../components/BoxCalculatorForm.vue';
 import BoxResultsDisplay from '../components/BoxResultsDisplay.vue';

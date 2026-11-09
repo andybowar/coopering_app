@@ -13,12 +13,12 @@
           <p class="text-grey-7 q-ma-none q-mb-sm">
             The base radius is the distance from the center of the pyramid's base to one of the base corners. If you think about the base as a polygon contained in a circle, the base radius is the radius of that circle.
           </p>
-          <img src="/pyramid_radius_illustration.jpg" alt="Base Radius Illustration" class="illustration-image q-mb-sm">
+          <img :src="assetUrl('pyramid_radius_illustration.jpg')" alt="Base Radius Illustration" class="illustration-image q-mb-sm">
           <div class="text-subtitle1 text-weight-medium q-mt-md q-mb-xs">Height</div>
           <p class="text-grey-7 q-ma-none q-mb-sm">
             The height is the distance from the bottom of the pyramid to the top. It should not be confused with the length of the side pieces.
           </p>
-          <img src="/pyramid_height_illustration.jpg" alt="Height Illustration" class="illustration-image">
+          <img :src="assetUrl('pyramid_height_illustration.jpg')" alt="Height Illustration" class="illustration-image">
         </div>
 
         <!-- Error Banner -->
@@ -138,6 +138,7 @@ import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { usePyramidCalculator } from '../composables/usePyramidCalculator';
 import { saveCalculation } from '../utils/storage';
+import { assetUrl } from '../utils/assetUrl';
 import type { SavedCalculation } from '../types/pyramid';
 import CalculatorForm from '../components/CalculatorForm.vue';
 import ResultsDisplay from '../components/ResultsDisplay.vue';

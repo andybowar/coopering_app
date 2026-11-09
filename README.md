@@ -47,6 +47,28 @@ or for PWA specifically:
 npm run build:pwa
 ```
 
+## Deployment (GitHub Pages)
+
+Pushing to `main` builds the PWA and publishes it to
+https://andybowar.github.io/coopering_app/ via `.github/workflows/deploy-pages.yml`.
+
+One-time setup: in the repo's **Settings → Pages**, set **Source** to
+**GitHub Actions**.
+
+Because Pages serves the app from a sub-path, the Pages build sets a base path:
+
+```bash
+npm run build:gh-pages   # DEPLOY_TARGET=gh-pages quasar build -m pwa
+```
+
+The base defaults to `/coopering_app/` and can be overridden with `GH_PAGES_BASE`
+(the workflow derives it from the repo name). Regular `npm run build` and the
+Capacitor/iOS/Android builds are unaffected and still serve from `/`.
+
+Public files under `public/` must be referenced through `assetUrl()`
+(`src/utils/assetUrl.ts`) rather than a hard-coded `/foo.jpg`, or they will 404
+on Pages. Routing uses hash mode, so no `404.html` fallback is needed.
+
 ## Technology Stack
 
 - Quasar Framework v2

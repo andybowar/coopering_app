@@ -12,7 +12,8 @@
     "test": "esbuild test/*.test.ts --bundle --platform=node --format=esm --packages=external --outdir=.test-build --log-level=warning && node --test '.test-build/*.test.js'",
     "dev": "quasar dev",
     "build": "quasar build",
-    "build:pwa": "quasar build -m pwa"
+    "build:pwa": "quasar build -m pwa",
+    "build:gh-pages": "DEPLOY_TARGET=gh-pages quasar build -m pwa"
   },
   "dependencies": {
     "@capacitor/android": "^8.1.0",
@@ -23,6 +24,7 @@
     "@quasar/extras": "^1.16.4",
     "cordova": "^13.0.0",
     "quasar": "^2.12.0",
+    "register-service-worker": "^1.7.2",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"
   },
